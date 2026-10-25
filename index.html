@@ -1,0 +1,2454 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brooms & Snakes of Hogwarts | مقشات وثعابين هوجورتس</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Magical English & Clear Child-Friendly Arabic -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@600;700;800&family=Cairo:wght@600;700;800;900&family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --hogwarts-night: #080b1a;
+            --hogwarts-blue: #111836;
+            --gryffindor-red: #740001;
+            --gryffindor-crimson: #ae0001;
+            --hogwarts-gold: #fbbf24;
+            --hogwarts-gold-dark: #d97706;
+            --slytherin-green: #1a472a;
+            --slytherin-emerald: #10b981;
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: radial-gradient(ellipse at top, #1b244d 0%, #090d21 60%, #050711 100%);
+            color: #fef3c7;
+            font-family: 'Fredoka', 'Cairo', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .font-magic {
+            font-family: 'Cinzel Decorative', 'Cairo', serif;
+        }
+
+        .font-cinzel {
+            font-family: 'Cinzel', 'Cairo', serif;
+        }
+
+        .font-arabic {
+            font-family: 'Cairo', sans-serif;
+        }
+
+        /* Magical Borders & Glows */
+        .gold-border {
+            border: 2px solid #fbbf24;
+            box-shadow: 0 0 15px rgba(251, 191, 36, 0.35), inset 0 0 15px rgba(251, 191, 36, 0.15);
+        }
+
+        .gold-glow-text {
+            text-shadow: 0 0 12px rgba(251, 191, 36, 0.8), 0 2px 4px rgba(0, 0, 0, 0.9);
+        }
+
+        /* Board Grid Container */
+        .board-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            aspect-ratio: 6 / 5;
+            background: rgba(13, 19, 46, 0.88);
+            border: 4px solid #fbbf24;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85), 0 0 30px rgba(251, 191, 36, 0.3);
+            overflow: hidden;
+        }
+
+        @media (max-width: 768px) {
+            .board-wrapper {
+                aspect-ratio: 6 / 5.6;
+                border-width: 3px;
+                border-radius: 14px;
+            }
+        }
+
+        .board-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            grid-template-rows: repeat(5, 1fr);
+            width: 100%;
+            height: 100%;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Individual Board Square */
+        .board-square {
+            position: relative;
+            border: 1px solid rgba(251, 191, 36, 0.28);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2px;
+            transition: transform 0.2s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+
+        .board-square:hover {
+            background-color: rgba(251, 191, 36, 0.14) !important;
+            box-shadow: inset 0 0 12px rgba(251, 191, 36, 0.4);
+            z-index: 15;
+        }
+
+        .square-even {
+            background: linear-gradient(135deg, rgba(22, 31, 74, 0.88), rgba(14, 20, 50, 0.92));
+        }
+
+        .square-odd {
+            background: linear-gradient(135deg, rgba(44, 17, 48, 0.82), rgba(25, 13, 38, 0.92));
+        }
+
+        .square-broom {
+            background: linear-gradient(135deg, rgba(120, 83, 13, 0.65), rgba(66, 32, 6, 0.85)) !important;
+            border: 1.5px solid rgba(251, 191, 36, 0.8) !important;
+            box-shadow: inset 0 0 15px rgba(251, 191, 36, 0.35);
+        }
+
+        .square-snake {
+            background: linear-gradient(135deg, rgba(6, 78, 59, 0.7), rgba(4, 47, 46, 0.9)) !important;
+            border: 1.5px solid rgba(16, 185, 129, 0.75) !important;
+            box-shadow: inset 0 0 15px rgba(16, 185, 129, 0.35);
+        }
+
+        .square-start {
+            background: linear-gradient(135deg, #740001, #450a0a) !important;
+            border: 2px solid #fbbf24 !important;
+        }
+
+        .square-finish {
+            background: linear-gradient(135deg, #b45309, #78350f, #451a03) !important;
+            border: 2px solid #fde047 !important;
+            box-shadow: inset 0 0 25px rgba(253, 224, 71, 0.6);
+        }
+
+        /* Player Token Animation */
+        .player-token {
+            position: absolute;
+            width: 58px;
+            height: 58px;
+            border-radius: 50%;
+            z-index: 40;
+            transform: translate(-50%, -50%);
+            transition: left 0.38s cubic-bezier(0.34, 1.56, 0.64, 1), top 0.38s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.35s ease;
+            box-shadow: 0 0 18px #fbbf24, 0 6px 14px rgba(0,0,0,0.85);
+            border: 3px solid #fbbf24;
+            background: radial-gradient(circle, #3b0764, #1e1b4b);
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: visible;
+        }
+
+        @media (max-width: 640px) {
+            .player-token {
+                width: 40px;
+                height: 40px;
+                border-width: 2px;
+            }
+        }
+
+        .token-hopping {
+            animation: tokenHop 0.36s ease-in-out;
+        }
+
+        @keyframes tokenHop {
+            0% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -80%) scale(1.25) rotate(-6deg); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+
+        .token-flying {
+            transition: left 1.1s cubic-bezier(0.22, 1, 0.36, 1), top 1.1s cubic-bezier(0.22, 1, 0.36, 1) !important;
+            animation: broomSpinGlow 1.1s ease-in-out;
+        }
+
+        @keyframes broomSpinGlow {
+            0% { transform: translate(-50%, -50%) scale(1); filter: drop-shadow(0 0 10px #fbbf24); }
+            50% { transform: translate(-50%, -70%) scale(1.45) rotate(12deg); filter: drop-shadow(0 0 28px #fde047); }
+            100% { transform: translate(-50%, -50%) scale(1); filter: drop-shadow(0 0 10px #fbbf24); }
+        }
+
+        .token-sliding {
+            transition: left 1.1s ease-in-out, top 1.1s ease-in-out !important;
+            animation: snakeWobble 1.1s ease-in-out;
+        }
+
+        @keyframes snakeWobble {
+            0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
+            25% { transform: translate(-60%, -50%) rotate(-15deg) scale(0.9); }
+            50% { transform: translate(-40%, -50%) rotate(15deg) scale(0.9); }
+            75% { transform: translate(-55%, -50%) rotate(-10deg) scale(0.9); }
+        }
+
+        /* Floating Animation */
+        .float-slow {
+            animation: floatSlow 3.2s ease-in-out infinite;
+        }
+
+        @keyframes floatSlow {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-7px); }
+        }
+
+        /* Magical Button */
+        .btn-magic {
+            background: linear-gradient(135deg, #b45309 0%, #fbbf24 50%, #d97706 100%);
+            color: #1e1b4b;
+            font-weight: 800;
+            border: 2px solid #fef08a;
+            box-shadow: 0 5px 15px rgba(251, 191, 36, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.6);
+            transition: all 0.2s ease;
+        }
+
+        .btn-magic:hover:not(:disabled) {
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 0 8px 25px rgba(251, 191, 36, 0.65), inset 0 2px 6px rgba(255, 255, 255, 0.8);
+        }
+
+        .btn-magic:active:not(:disabled) {
+            transform: translateY(1px) scale(0.98);
+        }
+
+        .btn-magic:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+
+        .btn-gryffindor {
+            background: linear-gradient(135deg, #991b1b 0%, #dc2626 50%, #7f1d1d 100%);
+            color: #fef3c7;
+            border: 2px solid #fbbf24;
+            box-shadow: 0 4px 15px rgba(220, 38, 38, 0.45);
+            transition: all 0.2s ease;
+        }
+
+        .btn-gryffindor:hover:not(:disabled) {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 6px 20px rgba(251, 191, 36, 0.5);
+        }
+
+        /* SVG Connectors Overlay */
+        #boardConnectorsSvg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 22;
+            pointer-events: none;
+        }
+
+        /* Sparkle Particle */
+        .wand-sparkle {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            border-radius: 50%;
+            animation: sparkleFade 0.75s ease-out forwards;
+        }
+
+        @keyframes sparkleFade {
+            0% { transform: scale(1) translate(0, 0); opacity: 1; }
+            100% { transform: scale(0) translate(var(--tx), var(--ty)); opacity: 0; }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #090d21;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #b45309;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="relative select-none">
+
+    <!-- Background Twinkling Stars Canvas -->
+    <canvas id="starsCanvas" class="fixed inset-0 pointer-events-none z-0"></canvas>
+
+    <!-- Fullscreen Interactive Spell Casting Effect Layer -->
+    <div id="spellEffectOverlay" class="fixed inset-0 pointer-events-none z-[120] hidden overflow-hidden"></div>
+
+    <!-- Top Navigation & Hogwarts HUD -->
+    <header class="relative z-30 w-full max-w-6xl mx-auto px-3 pt-3 pb-2">
+        <div class="bg-[#111836]/90 backdrop-blur-md gold-border rounded-2xl px-3 py-2.5 flex flex-wrap items-center justify-between gap-2">
+            <!-- Game Logo & Title -->
+            <div class="flex items-center gap-2.5">
+                <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-red-900 via-red-800 to-amber-700 border-2 border-amber-400 flex items-center justify-center text-2xl shadow-lg">
+                    ⚡
+                </div>
+                <div>
+                    <h1 class="font-magic text-base sm:text-xl text-amber-300 tracking-wide leading-tight gold-glow-text">
+                        Brooms & Snakes of Hogwarts
+                    </h1>
+                    <p class="font-arabic text-xs sm:text-sm text-amber-100/90 font-bold">
+                        مقشات وثعابين هوجورتس — مغامرة الحروف العربية
+                    </p>
+                </div>
+            </div>
+
+            <!-- House Cup Points & Unlocked Spells Counter -->
+            <div class="flex items-center flex-wrap gap-2">
+                <!-- House Points Badge -->
+                <div class="bg-gradient-to-r from-red-950/90 to-amber-950/90 border border-amber-400/70 rounded-xl px-3 py-1.5 flex items-center gap-2 shadow-inner">
+                    <span class="text-xl" title="House Cup">🏆</span>
+                    <div class="text-left leading-tight">
+                        <div class="text-[10px] uppercase tracking-wider text-amber-300/80 font-bold">House Points</div>
+                        <div class="text-sm sm:text-base font-extrabold text-amber-300" id="hudPointsDisplay">0 pts</div>
+                    </div>
+                </div>
+
+                <!-- Spellbook Button -->
+                <button onclick="openSpellbookModal()" class="btn-gryffindor px-3 py-1.5 rounded-xl flex items-center gap-1.5 text-xs sm:text-sm font-bold shadow-md">
+                    <span class="text-base">📖</span>
+                    <span>Spellbook | التعاويذ</span>
+                    <span id="spellCountBadge" class="bg-amber-400 text-slate-950 px-1.5 py-0.5 rounded-full text-xs font-extrabold">0/5</span>
+                </button>
+
+                <!-- Music Toggle Button -->
+                <button id="musicToggleBtn" onclick="toggleBackgroundMusic()" class="bg-indigo-950/90 hover:bg-indigo-900 border border-amber-400/60 text-amber-200 px-2.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1 transition" title="Toggle Hedwig's Theme Music">
+                    <span id="musicIcon">🎵</span>
+                    <span id="musicStatusText" class="hidden sm:inline">Music: ON</span>
+                </button>
+
+                <!-- SFX Toggle Button -->
+                <button id="sfxToggleBtn" onclick="toggleSFX()" class="bg-indigo-950/90 hover:bg-indigo-900 border border-amber-400/60 text-amber-200 px-2.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1 transition" title="Toggle Sound Effects">
+                    <span id="sfxIcon">🔊</span>
+                </button>
+
+                <!-- Setup / Avatar Change Button -->
+                <button onclick="openSetupModal()" class="bg-slate-900/90 hover:bg-slate-800 border border-amber-400/50 text-amber-200 px-2.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1 transition" title="Player & Avatar Settings">
+                    <span>🎩</span>
+                    <span class="hidden md:inline">Sorting Hat</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Game Content Layout -->
+    <main class="relative z-20 max-w-6xl mx-auto px-3 py-2 grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+
+        <!-- Left / Top Control Panel (Player Status + Wand Dice Roller + Legend) -->
+        <aside class="lg:col-span-4 flex flex-col gap-3 order-2 lg:order-1">
+
+            <!-- Current Turn & Players Card -->
+            <div class="bg-[#111836]/90 backdrop-blur-md gold-border rounded-2xl p-4 shadow-xl">
+                <div class="flex items-center justify-between border-b border-amber-400/25 pb-2.5 mb-3">
+                    <div>
+                        <span class="text-xs uppercase tracking-wider text-amber-300/80 font-bold block">Current Wizard Turn</span>
+                        <h2 id="turnTitleText" class="text-base sm:text-lg font-extrabold text-amber-300 font-arabic">دور الساحر الأول</h2>
+                    </div>
+                    <span class="bg-amber-500/20 border border-amber-400/50 text-amber-200 text-xs font-bold px-2.5 py-1 rounded-full" id="boardLevelBadge">
+                        Board #1 🌟
+                    </span>
+                </div>
+
+                <!-- Players List -->
+                <div id="playersStatusContainer" class="space-y-2.5">
+                    <!-- Populated dynamically by JS -->
+                </div>
+
+                <!-- Magical Wand Dice Roller -->
+                <div class="mt-4 pt-3 border-t border-amber-400/25 text-center">
+                    <div class="flex items-center justify-center gap-4 mb-3">
+                        <!-- Animated Dice / Magical Orb -->
+                        <div id="magicDiceBox" class="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500 via-yellow-400 to-amber-700 border-2 border-white shadow-[0_0_20px_rgba(251,191,36,0.7)] flex flex-col items-center justify-center text-slate-950 font-black text-3xl transition-transform duration-300">
+                            <span id="diceValueDisplay">🪄</span>
+                        </div>
+                        <div class="text-left">
+                            <div class="text-xs text-amber-200/80 font-semibold">Magical Wand Roll (1 - 4)</div>
+                            <div id="dicePromptText" class="text-sm sm:text-base font-bold text-white font-arabic">
+                                اضغطي على العصا السحرية للتحرك!
+                            </div>
+                            <div id="diceSubPrompt" class="text-xs text-amber-300/90 mt-0.5">
+                                Tap the button below to cast your move!
+                            </div>
+                        </div>
+                    </div>
+
+                    <button id="rollWandBtn" onclick="rollMagicalWand()" class="btn-magic w-full py-3 px-4 rounded-xl text-base sm:text-lg flex items-center justify-center gap-2 shadow-lg">
+                        <span class="text-xl">🪄</span>
+                        <span>Cast Move! | حرّك العصا السحرية</span>
+                        <span class="text-xl">✨</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Board Legend & Quick Teacher Controls -->
+            <div class="bg-[#111836]/90 backdrop-blur-md gold-border rounded-2xl p-3.5 shadow-xl space-y-2.5">
+                <h3 class="text-xs sm:text-sm font-bold uppercase tracking-wider text-amber-300 flex items-center justify-between">
+                    <span>⚡ Hogwarts Map Guide | دليل الخريطة</span>
+                    <span class="text-[11px] text-amber-200/75 font-normal">Click any square to hear it!</span>
+                </h3>
+
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                    <div class="bg-amber-950/50 border border-amber-400/40 rounded-xl p-2 flex items-center gap-2">
+                        <span class="text-xl">🧹</span>
+                        <div>
+                            <div class="font-bold text-amber-300">Flying Broom</div>
+                            <div class="text-[11px] text-amber-100/80 font-arabic">جاوبي صح لتطيري للأعلى!</div>
+                        </div>
+                    </div>
+                    <div class="bg-emerald-950/60 border border-emerald-400/40 rounded-xl p-2 flex items-center gap-2">
+                        <span class="text-xl">🐍</span>
+                        <div>
+                            <div class="font-bold text-emerald-300">Slytherin Snake</div>
+                            <div class="text-[11px] text-emerald-100/80 font-arabic">تعويذة حماية حتى لا تنزلي!</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Teacher Helper Bar -->
+                <div class="pt-2 border-t border-amber-400/20 flex flex-wrap items-center justify-between gap-1.5 text-xs">
+                    <span class="text-amber-200/80 font-semibold">🎓 Teacher Tools:</span>
+                    <div class="flex flex-wrap gap-1.5">
+                        <button onclick="teacherPracticeCurrentSquare()" class="bg-indigo-900/80 hover:bg-indigo-800 border border-indigo-400/40 text-amber-100 px-2.5 py-1 rounded-lg font-semibold transition">
+                            🔍 Open Current Letter
+                        </button>
+                        <button onclick="teacherJumpToFinish()" class="bg-amber-900/70 hover:bg-amber-800 border border-amber-400/40 text-amber-100 px-2.5 py-1 rounded-lg font-semibold transition" title="Jump near Hogwarts Castle to celebrate & unlock a new spell!">
+                            🏰 Win & Unlock Spell
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </aside>
+
+        <!-- Right / Main 30-Square Brooms & Snakes Board -->
+        <section class="lg:col-span-8 order-1 lg:order-2 w-full">
+            <div id="boardWrapper" class="board-wrapper">
+                <!-- SVG Layer for Brooms (Ladders) and Snakes Paths -->
+                <svg id="boardConnectorsSvg" viewBox="0 0 600 500" preserveAspectRatio="none"></svg>
+
+                <!-- 30 Squares Grid -->
+                <div id="boardGrid" class="board-grid">
+                    <!-- Generated dynamically by JavaScript -->
+                </div>
+
+                <!-- Player 1 Animated Token -->
+                <div id="playerToken0" class="player-token" style="left: 8.33%; top: 90%;">
+                    <!-- Avatar injected by JS -->
+                </div>
+
+                <!-- Player 2 Animated Token (Hidden in 1P mode) -->
+                <div id="playerToken1" class="player-token hidden" style="left: 8.33%; top: 90%;">
+                    <!-- Avatar injected by JS -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ==========================================
+         MODAL 1: SORTING HAT WELCOME & AVATAR SETUP
+         ========================================== -->
+    <div id="setupModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-3 overflow-y-auto">
+        <div class="bg-gradient-to-b from-[#161f4a] via-[#101638] to-[#090d24] gold-border rounded-3xl max-w-2xl w-full p-5 sm:p-6 shadow-2xl my-auto">
+            <!-- Header -->
+            <div class="text-center mb-4">
+                <div class="inline-block text-4xl sm:text-5xl mb-1 float-slow">🎩✨</div>
+                <h2 class="font-magic text-xl sm:text-2xl text-amber-300 gold-glow-text">
+                    Welcome to Hogwarts Arabic Adventure!
+                </h2>
+                <p class="font-arabic text-sm sm:text-base text-amber-100/90 font-bold mt-0.5">
+                    أهلاً بكِ في مغامرة حروف اللغة العربية في مدرسة هوجورتس للسحر!
+                </p>
+            </div>
+
+            <!-- Number of Players Toggle -->
+            <div class="mb-4">
+                <label class="block text-xs uppercase tracking-wider text-amber-300 font-bold mb-2 text-center">
+                    1. Choose Game Mode | اختاري نظام اللعب
+                </label>
+                <div class="grid grid-cols-2 gap-3 max-w-md mx-auto">
+                    <button id="mode1PBtn" onclick="selectPlayerCount(1)" class="py-2.5 px-3 rounded-xl font-bold text-sm border-2 border-amber-400 bg-amber-500/25 text-amber-200 flex items-center justify-center gap-2 transition">
+                        <span>🧙‍♀️</span>
+                        <span>1 Player (Solo)</span>
+                    </button>
+                    <button id="mode2PBtn" onclick="selectPlayerCount(2)" class="py-2.5 px-3 rounded-xl font-bold text-sm border border-amber-400/30 bg-slate-900/60 text-slate-300 flex items-center justify-center gap-2 transition">
+                        <span>🧙‍♀️⚡🧙‍♂️</span>
+                        <span>2 Players (With Teacher)</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Player 1 Character & Custom Photo Selection -->
+            <div class="bg-slate-950/60 border border-amber-400/35 rounded-2xl p-3.5 mb-3">
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
+                    <span class="text-xs sm:text-sm font-bold text-amber-300">
+                        🌟 Wizard 1 Avatar (شخصية الطفلة / البوينت المتحركة):
+                    </span>
+                    <input id="player1NameInput" type="text" value="Little Witch ⚡" class="bg-slate-900 border border-amber-400/50 rounded-lg px-2.5 py-1 text-xs sm:text-sm text-amber-100 font-bold w-40 focus:outline-none focus:border-amber-400" placeholder="Player 1 Name">
+                </div>
+
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                    <!-- Option 1: Harry Potter SVG -->
+                    <button onclick="selectPresetAvatar(0, 'harry')" id="p0_avatar_harry" class="avatar-choice-p0 border-2 border-amber-400 bg-amber-500/20 rounded-xl p-2 flex flex-col items-center gap-1 transition hover:bg-amber-500/30">
+                        <div class="w-14 h-14 rounded-full border-2 border-amber-400 overflow-hidden bg-indigo-950 flex items-center justify-center" id="previewSvgHarry0"></div>
+                        <span class="text-xs font-bold text-amber-200">Harry Potter</span>
+                    </button>
+
+                    <!-- Option 2: Hermione Granger SVG -->
+                    <button onclick="selectPresetAvatar(0, 'hermione')" id="p0_avatar_hermione" class="avatar-choice-p0 border border-amber-400/30 bg-slate-900/70 rounded-xl p-2 flex flex-col items-center gap-1 transition hover:bg-amber-500/20">
+                        <div class="w-14 h-14 rounded-full border-2 border-amber-400 overflow-hidden bg-indigo-950 flex items-center justify-center" id="previewSvgHermione0"></div>
+                        <span class="text-xs font-bold text-amber-200">Hermione</span>
+                    </button>
+
+                    <!-- Option 3: Hedwig Owl SVG -->
+                    <button onclick="selectPresetAvatar(0, 'hedwig')" id="p0_avatar_hedwig" class="avatar-choice-p0 border border-amber-400/30 bg-slate-900/70 rounded-xl p-2 flex flex-col items-center gap-1 transition hover:bg-amber-500/20">
+                        <div class="w-14 h-14 rounded-full border-2 border-amber-400 overflow-hidden bg-indigo-950 flex items-center justify-center" id="previewSvgHedwig0"></div>
+                        <span class="text-xs font-bold text-amber-200">Hedwig Owl</span>
+                    </button>
+
+                    <!-- Option 4: Upload Any Custom Photo (Harry Potter pic or Child's Photo) -->
+                    <label class="avatar-choice-p0 border border-dashed border-amber-400/70 bg-amber-950/30 hover:bg-amber-900/40 rounded-xl p-2 flex flex-col items-center justify-center gap-1 cursor-pointer transition text-center" id="p0_avatar_custom">
+                        <div id="customPhotoPreview0" class="w-14 h-14 rounded-full border-2 border-amber-400 overflow-hidden bg-slate-900 flex items-center justify-center text-2xl">
+                            📷
+                        </div>
+                        <span class="text-[11px] font-bold text-amber-300 leading-tight">Upload Photo<br>ارفعي صورة</span>
+                        <input type="file" accept="image/*" class="hidden" onchange="handleCustomAvatarUpload(event, 0)">
+                    </label>
+                </div>
+            </div>
+
+            <!-- Player 2 Character Selection (Shown when 2P mode is active) -->
+            <div id="player2SetupBox" class="hidden bg-slate-950/60 border border-amber-400/35 rounded-2xl p-3.5 mb-3">
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                    <span class="text-xs sm:text-sm font-bold text-emerald-300">
+                        🌟 Wizard 2 Avatar (شخصية المعلم أو الصديق):
+                    </span>
+                    <input id="player2NameInput" type="text" value="Professor 🦉" class="bg-slate-900 border border-emerald-400/50 rounded-lg px-2.5 py-1 text-xs sm:text-sm text-emerald-100 font-bold w-40 focus:outline-none">
+                </div>
+                <div class="grid grid-cols-3 gap-2">
+                    <button onclick="selectPresetAvatar(1, 'hermione')" id="p1_avatar_hermione" class="border-2 border-emerald-400 bg-emerald-500/20 rounded-xl p-1.5 flex items-center justify-center gap-2 text-xs font-bold text-emerald-200">
+                        <span>👧🪄 Hermione</span>
+                    </button>
+                    <button onclick="selectPresetAvatar(1, 'harry')" id="p1_avatar_harry" class="border border-emerald-400/30 bg-slate-900/70 rounded-xl p-1.5 flex items-center justify-center gap-2 text-xs font-bold text-emerald-200">
+                        <span>👦⚡ Harry Potter</span>
+                    </button>
+                    <button onclick="selectPresetAvatar(1, 'hedwig')" id="p1_avatar_hedwig" class="border border-emerald-400/30 bg-slate-900/70 rounded-xl p-1.5 flex items-center justify-center gap-2 text-xs font-bold text-emerald-200">
+                        <span>🦉✉️ Hedwig</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Optional Custom MP3 Music Upload (In addition to Built-in Hedwig's Theme) -->
+            <div class="bg-indigo-950/50 border border-indigo-400/30 rounded-xl px-3.5 py-2.5 mb-4 flex flex-wrap items-center justify-between gap-2 text-xs">
+                <div class="flex items-center gap-2">
+                    <span class="text-lg">🎶</span>
+                    <div>
+                        <div class="font-bold text-amber-200">Hedwig's Theme Music Box (Built-in & Ready!)</div>
+                        <div class="text-amber-100/70 font-arabic">اللحن السحري مدمج تلقائياً، أو يمكنك اختيار ملف MP3 من جهازك:</div>
+                    </div>
+                </div>
+                <label class="bg-indigo-900 hover:bg-indigo-800 border border-amber-400/50 text-amber-200 px-3 py-1.5 rounded-lg font-bold cursor-pointer transition">
+                    <span>📂 Optional MP3</span>
+                    <input type="file" accept="audio/*" class="hidden" onchange="handleCustomMusicUpload(event)">
+                </label>
+            </div>
+
+            <!-- Start Adventure Button -->
+            <button onclick="startGameFromModal()" class="btn-magic w-full py-3.5 rounded-2xl text-base sm:text-lg font-extrabold flex items-center justify-center gap-2 shadow-xl">
+                <span>⚡</span>
+                <span>Start Hogwarts Adventure! | ابدأي المغامرة السحرية</span>
+                <span>🧹</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         MODAL 2: HOGWARTS LETTER & CHALLENGE CARD
+         ========================================== -->
+    <div id="letterCardModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden items-center justify-center p-3 overflow-y-auto">
+        <div class="bg-gradient-to-b from-[#1a2352] via-[#11183b] to-[#0b0f26] gold-border rounded-3xl max-w-xl w-full p-5 sm:p-6 shadow-2xl my-auto relative overflow-hidden">
+
+            <!-- Top Challenge Type Banner (Normal / Flying Broom / Slytherin Snake Shield) -->
+            <div id="cardBanner" class="rounded-2xl px-4 py-2.5 mb-4 flex items-center justify-between border">
+                <div class="flex items-center gap-2.5">
+                    <span id="cardBannerIcon" class="text-2xl sm:text-3xl">🪄</span>
+                    <div>
+                        <h3 id="cardBannerTitle" class="font-bold text-sm sm:text-base text-amber-200">Magical Letter Discovery!</h3>
+                        <p id="cardBannerSubtitle" class="text-xs text-amber-100/90 font-arabic">تعويذة الحرف العربي السحري</p>
+                    </div>
+                </div>
+                <span id="cardSquareBadge" class="bg-black/40 text-amber-300 border border-amber-400/40 px-2.5 py-1 rounded-full text-xs font-extrabold">
+                    Square #2
+                </span>
+            </div>
+
+            <!-- Main Letter Showcase & Audio Button -->
+            <div class="grid grid-cols-1 sm:grid-cols-12 gap-4 items-center bg-slate-950/65 border border-amber-400/35 rounded-2xl p-4 mb-4">
+                <!-- Giant Glowing Arabic Letter -->
+                <div class="sm:col-span-5 flex flex-col items-center justify-center bg-gradient-to-br from-amber-500/20 via-red-900/30 to-indigo-950 border-2 border-amber-400 rounded-2xl p-4 shadow-inner">
+                    <div id="modalArabicLetter" class="font-arabic text-6xl sm:text-7xl font-black text-amber-300 gold-glow-text leading-none py-2">
+                        ب
+                    </div>
+                    <div id="modalLetterName" class="mt-2 text-sm sm:text-base font-extrabold text-white tracking-wide">
+                        Baa (باء)
+                    </div>
+                    <button onclick="speakCurrentModalLetter()" class="mt-2.5 btn-magic px-3.5 py-1.5 rounded-xl text-xs sm:text-sm flex items-center gap-1.5 shadow-md">
+                        <span>🔊</span>
+                        <span>Listen | اسمعي الصوت</span>
+                    </button>
+                </div>
+
+                <!-- Word Example, Pronunciation Tip, and Transfiguration Forms -->
+                <div class="sm:col-span-7 space-y-2.5 text-left">
+                    <!-- Example Word Box -->
+                    <div class="bg-indigo-950/70 border border-amber-400/30 rounded-xl p-2.5 flex items-center justify-between">
+                        <div>
+                            <span class="text-[11px] uppercase tracking-wider text-amber-300/80 font-bold block">Magical Example Word</span>
+                            <div class="flex items-baseline gap-2 mt-0.5">
+                                <span id="modalWordArabic" class="font-arabic text-xl sm:text-2xl font-black text-amber-300" dir="rtl">بُومَة</span>
+                                <span id="modalWordPhonetic" class="text-xs sm:text-sm font-bold text-amber-100">(Booma)</span>
+                            </div>
+                            <div id="modalWordEnglish" class="text-xs sm:text-sm text-emerald-300 font-bold">Owl</div>
+                        </div>
+                        <div id="modalWordEmoji" class="text-4xl sm:text-5xl">🦉</div>
+                    </div>
+
+                    <!-- Friendly Pronunciation Secret for Foreign Kids -->
+                    <div class="bg-amber-950/40 border border-amber-400/25 rounded-xl p-2.5">
+                        <div class="text-[11px] font-bold text-amber-300 flex items-center gap-1">
+                            <span>💡</span>
+                            <span>How to say it (طريقة النطق):</span>
+                        </div>
+                        <p id="modalPronunciationTip" class="text-xs text-amber-100/95 mt-0.5 leading-relaxed">
+                            Sounds just like the English letter 'B' in 'Book' or 'Bird'!
+                        </p>
+                    </div>
+
+                    <!-- Transfiguration Class: 3 Shapes of the Letter in a Word -->
+                    <div class="bg-slate-900/80 border border-purple-400/30 rounded-xl p-2.5">
+                        <div class="text-[11px] font-bold text-purple-300 mb-1.5 flex items-center justify-between">
+                            <span>✨ Transfiguration (أشكال الحرف في الكلمة):</span>
+                            <span class="text-[10px] text-purple-200/75">Right to Left ⬅️</span>
+                        </div>
+                        <div class="grid grid-cols-3 gap-1.5 text-center" dir="rtl">
+                            <div class="bg-slate-950/90 border border-purple-400/25 rounded-lg py-1 px-1">
+                                <div class="text-[10px] text-purple-200/70">أول الكلمة (Start)</div>
+                                <div id="formStart" class="font-arabic text-lg sm:text-xl font-bold text-amber-300">بـ</div>
+                            </div>
+                            <div class="bg-slate-950/90 border border-purple-400/25 rounded-lg py-1 px-1">
+                                <div class="text-[10px] text-purple-200/70">وسط الكلمة (Mid)</div>
+                                <div id="formMiddle" class="font-arabic text-lg sm:text-xl font-bold text-amber-300">ـبـ</div>
+                            </div>
+                            <div class="bg-slate-950/90 border border-purple-400/25 rounded-lg py-1 px-1">
+                                <div class="text-[10px] text-purple-200/70">آخر الكلمة (End)</div>
+                                <div id="formEnd" class="font-arabic text-lg sm:text-xl font-bold text-amber-300">ـب</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interactive Mini-Quiz Section -->
+            <div class="bg-indigo-950/60 border border-amber-400/40 rounded-2xl p-4">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs font-extrabold uppercase tracking-wider text-amber-300">
+                        🪄 Cast Your Spell Quiz | اختاري الإجابة الصحيحة:
+                    </span>
+                    <button onclick="speakCurrentModalLetter()" class="text-xs text-amber-300 underline hover:text-amber-200">
+                        🔊 Hear Hint
+                    </button>
+                </div>
+
+                <p id="quizQuestionText" class="text-sm sm:text-base font-bold text-white mb-3">
+                    Which Arabic letter makes the sound "Baa"?
+                </p>
+
+                <!-- 3 Quiz Options -->
+                <div id="quizOptionsContainer" class="grid grid-cols-3 gap-3">
+                    <!-- Populated by JS -->
+                </div>
+
+                <!-- Quiz Feedback Banner -->
+                <div id="quizFeedbackBox" class="hidden mt-3 p-3 rounded-xl text-center font-bold text-sm"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ==========================================
+         MODAL 3: END-OF-BOARD VICTORY & NEW SPELL UNLOCKED!
+         ========================================== -->
+    <div id="victorySpellModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden items-center justify-center p-3 overflow-y-auto">
+        <div class="bg-gradient-to-b from-[#23153c] via-[#13183d] to-[#090c1f] gold-border rounded-3xl max-w-xl w-full p-5 sm:p-6 shadow-2xl my-auto text-center relative">
+            <div class="text-5xl sm:text-6xl mb-1 float-slow">🏰🏆✨</div>
+            <div class="inline-block bg-amber-400/20 border border-amber-400 text-amber-300 px-3 py-0.5 rounded-full text-xs font-extrabold uppercase tracking-widest mb-1">
+                You Reached Hogwarts Castle!
+            </div>
+            <h2 class="font-magic text-2xl sm:text-3xl text-amber-300 gold-glow-text">
+                New Harry Potter Spell Unlocked!
+            </h2>
+            <p class="font-arabic text-sm sm:text-base text-amber-100 font-bold mt-0.5">
+                أحسنتِ يا ساحرة هوجورتس! لقد تعلمتِ تعويذة جديدة من عالم هاري بوتر كمكافأة!
+            </p>
+
+            <!-- Unlocked Spell Showcase Card -->
+            <div class="my-4 bg-slate-950/80 border-2 border-amber-400 rounded-2xl p-4 shadow-[0_0_30px_rgba(251,191,36,0.3)]">
+                <div id="unlockedSpellIcon" class="text-5xl sm:text-6xl mb-2">🪶✨</div>
+                <h3 id="unlockedSpellName" class="font-magic text-2xl sm:text-3xl text-amber-300 tracking-wide">
+                    Wingardium Leviosa!
+                </h3>
+                <div id="unlockedSpellArabic" class="font-arabic text-base sm:text-lg font-extrabold text-emerald-300 mt-0.5">
+                    تعويذة التحليق والطيران (The Levitation Charm)
+                </div>
+                <p id="unlockedSpellDesc" class="text-xs sm:text-sm text-amber-100/90 mt-2 leading-relaxed max-w-md mx-auto">
+                    Swish and flick your wand! This charm makes feathers, magical objects, and Arabic letters float high in the air!
+                </p>
+
+                <!-- Interactive "Cast This Spell Now!" Button -->
+                <button id="castUnlockedSpellBtn" onclick="triggerSpellAnimation(currentUnlockedSpellIndex)" class="mt-4 btn-magic px-6 py-3 rounded-xl text-base sm:text-lg font-black inline-flex items-center gap-2 shadow-xl">
+                    <span>🪄</span>
+                    <span>Cast Spell Now! | جربي التعويذة السحرية الآن</span>
+                    <span>✨</span>
+                </button>
+            </div>
+
+            <!-- Action Buttons: Open Spellbook or Start Next Board -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
+                <button onclick="openSpellbookModal()" class="btn-gryffindor py-3 px-4 rounded-xl font-bold text-sm sm:text-base flex items-center justify-center gap-2">
+                    <span>📖</span>
+                    <span>View My Spellbook | كتاب التعاويذ</span>
+                </button>
+                <button onclick="startNextBoardRound()" class="btn-magic py-3 px-4 rounded-xl font-extrabold text-sm sm:text-base flex items-center justify-center gap-2">
+                    <span>🧹</span>
+                    <span>Play Next Board | جولة جديدة</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         MODAL 4: MY HOGWARTS SPELLBOOK (كتاب التعاويذ)
+         ========================================== -->
+    <div id="spellbookModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden items-center justify-center p-3 overflow-y-auto">
+        <div class="bg-gradient-to-b from-[#1a1638] via-[#111530] to-[#080a1a] gold-border rounded-3xl max-w-3xl w-full p-5 sm:p-6 shadow-2xl my-auto">
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-amber-400/30 pb-3 mb-4">
+                <div class="flex items-center gap-2.5">
+                    <span class="text-3xl">📖</span>
+                    <div>
+                        <h2 class="font-magic text-xl sm:text-2xl text-amber-300 gold-glow-text">
+                            Hogwarts Book of Spells | كتاب التعاويذ السحرية
+                        </h2>
+                        <p class="text-xs sm:text-sm text-amber-100/85 font-arabic">
+                            في نهاية كل بورد تتعلمين تعويذة سحرية جديدة من هاري بوتر! اضغطي على أي تعويذة لتجربتها
+                        </p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="unlockAllSpellsTeacher()" class="bg-purple-900/80 hover:bg-purple-800 border border-purple-400/50 text-purple-100 text-xs px-2.5 py-1.5 rounded-xl font-bold transition" title="Teacher Button: Unlock all 5 spells immediately">
+                        🔓 Unlock All (Teacher)
+                    </button>
+                    <button onclick="closeSpellbookModal()" class="bg-red-900/80 hover:bg-red-800 border border-amber-400/50 text-amber-100 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold">
+                        ✖ Close
+                    </button>
+                </div>
+            </div>
+
+            <!-- 5 Spells Grid -->
+            <div id="spellbookGrid" class="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[65vh] overflow-y-auto pr-1">
+                <!-- Populated dynamically by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        /* =====================================================================
+           1. COMPLETE 28 ARABIC ALPHABET LETTERS DATA (Squares 2 to 29)
+              Designed specifically for an English-speaking child!
+           ===================================================================== */
+        const ARABIC_LETTERS = [
+            {
+                square: 2, letter: 'أ', nameEn: 'Alif', nameAr: 'أَلِف',
+                soundTip: "Sounds like a clear 'Aa' as in 'Apple' or 'Amazing'!",
+                forms: { start: 'أ', mid: 'ـأ', end: 'ـأ' },
+                wordAr: 'أَسَد', wordPhonetic: 'Asad', wordEn: 'Lion', emoji: '🦁'
+            },
+            {
+                square: 3, letter: 'ب', nameEn: 'Baa', nameAr: 'بَاء',
+                soundTip: "Easy! Sounds just like 'B' in 'Broom' or 'Bat'! (Has 1 dot under the cauldron)",
+                forms: { start: 'بـ', mid: 'ـبـ', end: 'ـب' },
+                wordAr: 'بُومَة', wordPhonetic: 'Booma', wordEn: 'Hedwig Owl', emoji: '🦉'
+            },
+            {
+                square: 4, letter: 'ت', nameEn: 'Taa', nameAr: 'تَاء',
+                soundTip: "Sounds like a soft 'T' in 'Tea'! Look at its 2 happy eyes (dots) on top!",
+                forms: { start: 'تـ', mid: 'ـتـ', end: 'ـت' },
+                wordAr: 'تَاج', wordPhonetic: 'Taaj', wordEn: 'Golden Crown', emoji: '👑'
+            },
+            {
+                square: 5, letter: 'ث', nameEn: 'Thaa', nameAr: 'ثَاء',
+                soundTip: "Put the tip of your tongue out lightly like 'TH' in 'Three' or 'Thank you'! (3 dots on top)",
+                forms: { start: 'ثـ', mid: 'ـثـ', end: 'ـث' },
+                wordAr: 'ثَعْلَب', wordPhonetic: 'Tha’lab', wordEn: 'Clever Fox', emoji: '🦊'
+            },
+            {
+                square: 6, letter: 'ج', nameEn: 'Jeem', nameAr: 'جِيم',
+                soundTip: "Sounds like 'J' in 'Jellybeans' or 'G' in 'Gem'! (Has 1 jewel dot inside its tummy)",
+                forms: { start: 'جـ', mid: 'ـجـ', end: 'ـج' },
+                wordAr: 'جَمَل', wordPhonetic: 'Jamal', wordEn: 'Camel', emoji: '🐪'
+            },
+            {
+                square: 7, letter: 'ح', nameEn: 'Haa', nameAr: 'حَاء',
+                soundTip: "Magical Breath Spell! Whisper a warm 'Haa' from deep in your throat like warming cold hands!",
+                forms: { start: 'حـ', mid: 'ـحـ', end: 'ـح' },
+                wordAr: 'حِصَان', wordPhonetic: 'Hisaan', wordEn: 'Magical Horse', emoji: '🐴'
+            },
+            {
+                square: 8, letter: 'خ', nameEn: 'Khaa', nameAr: 'خَاء',
+                soundTip: "Sleeping Dragon Spell! Make a gentle scratchy sound at the top of your throat: 'Khaa'!",
+                forms: { start: 'خـ', mid: 'ـخـ', end: 'ـخ' },
+                wordAr: 'خَاتَم', wordPhonetic: 'Khaatam', wordEn: 'Magic Ring', emoji: '💍'
+            },
+            {
+                square: 9, letter: 'د', nameEn: 'Daal', nameAr: 'دَال',
+                soundTip: "Sounds just like 'D' in 'Dragon' or 'Door'!",
+                forms: { start: 'د', mid: 'ـد', end: 'ـد' },
+                wordAr: 'دُبّ', wordPhonetic: 'Dubb', wordEn: 'Fluffy Bear', emoji: '🐻'
+            },
+            {
+                square: 10, letter: 'ذ', nameEn: 'Dhaal', nameAr: 'ذَال',
+                soundTip: "Buzzing 'TH' sound like in 'This' or 'That'! (Looks like Daal with 1 golden star dot on top)",
+                forms: { start: 'ذ', mid: 'ـذ', end: 'ـذ' },
+                wordAr: 'ذَهَب', wordPhonetic: 'Dhahab', wordEn: 'Hogwarts Gold', emoji: '🪙'
+            },
+            {
+                square: 11, letter: 'ر', nameEn: 'Raa', nameAr: 'رَاء',
+                soundTip: "A quick, cheerful tap of the tongue: 'Raa'!",
+                forms: { start: 'ر', mid: 'ـر', end: 'ـر' },
+                wordAr: 'رِيشَة', wordPhonetic: 'Reesha', wordEn: 'Flying Feather', emoji: '🪶'
+            },
+            {
+                square: 12, letter: 'ز', nameEn: 'Zaay', nameAr: 'زَاي',
+                soundTip: "Buzz like a magical bee: 'Zzzz' as in 'Zoom'!",
+                forms: { start: 'ز', mid: 'ـز', end: 'ـز' },
+                wordAr: 'زَهْرَة', wordPhonetic: 'Zahra', wordEn: 'Magic Flower', emoji: '🌸'
+            },
+            {
+                square: 13, letter: 'س', nameEn: 'Seen', nameAr: 'سِين',
+                soundTip: "Smooth 'S' sound like in 'Star' or 'Spell'!",
+                forms: { start: 'سـ', mid: 'ـسـ', end: 'ـس' },
+                wordAr: 'سَاحِر', wordPhonetic: 'Saahir', wordEn: 'Wizard', emoji: '🧙‍♂️'
+            },
+            {
+                square: 14, letter: 'ش', nameEn: 'Sheen', nameAr: 'شِين',
+                soundTip: "Sounds like 'SH' in 'Shiny' or 'Shhh, quiet in the library!' (Has 3 dots on top)",
+                forms: { start: 'شـ', mid: 'ـشـ', end: 'ـش' },
+                wordAr: 'شَمْس', wordPhonetic: 'Shams', wordEn: 'Bright Sun', emoji: '☀️'
+            },
+            {
+                square: 15, letter: 'ص', nameEn: 'Saad', nameAr: 'صَاد',
+                soundTip: "A strong, deep royal 'S' sound with a round mouth: 'Saad'!",
+                forms: { start: 'صـ', mid: 'ـصـ', end: 'ـص' },
+                wordAr: 'صندوق', wordPhonetic: 'Sundooq', wordEn: 'Treasure Chest', emoji: '🧰'
+            },
+            {
+                square: 16, letter: 'ض', nameEn: 'Daad', nameAr: 'ضَاد',
+                soundTip: "A strong, deep 'D' sound! Arabic is famous for this special royal letter!",
+                forms: { start: 'ضـ', mid: 'ـضـ', end: 'ـض' },
+                wordAr: 'ضِفْدَع', wordPhonetic: 'Difda’', wordEn: 'Chocolate Frog', emoji: '🐸'
+            },
+            {
+                square: 17, letter: 'ط', nameEn: 'Taa (Strong)', nameAr: 'طَاء',
+                soundTip: "A bold, strong 'T' sound with a full mouth: 'Taa'!",
+                forms: { start: 'طـ', mid: 'ـطـ', end: 'ـط' },
+                wordAr: 'طَائِر', wordPhonetic: 'Taa’ir', wordEn: 'Magical Bird', emoji: '🐦'
+            },
+            {
+                square: 18, letter: 'ظ', nameEn: 'Zaa (Strong)', nameAr: 'ظَاء',
+                soundTip: "A deep, strong 'TH' sound (like 'This' said in a giant's voice)!",
+                forms: { start: 'ظـ', mid: 'ـظـ', end: 'ـظ' },
+                wordAr: 'ظَرْف', wordPhonetic: 'Zarf', wordEn: 'Hogwarts Letter', emoji: '✉️'
+            },
+            {
+                square: 19, letter: 'ع', nameEn: 'Ayn', nameAr: 'عَيْن',
+                soundTip: "Super Magical Sound! Open your throat wide and say a deep 'Aaa' from inside!",
+                forms: { start: 'عـ', mid: 'ـعـ', end: 'ـع' },
+                wordAr: 'عَصَا', wordPhonetic: 'Asaa', wordEn: 'Magic Wand', emoji: '🪄'
+            },
+            {
+                square: 20, letter: 'غ', nameEn: 'Ghayn', nameAr: 'غَيْن',
+                soundTip: "Sounds like gargling water gently or a French 'R': 'Ghaa'!",
+                forms: { start: 'غـ', mid: 'ـغـ', end: 'ـغ' },
+                wordAr: 'غَيْمَة', wordPhonetic: 'Ghayma', wordEn: 'Sky Cloud', emoji: '☁️'
+            },
+            {
+                square: 21, letter: 'ف', nameEn: 'Faa', nameAr: 'فَاء',
+                soundTip: "Easy! Sounds just like 'F' in 'Fly' or 'Feather'!",
+                forms: { start: 'فـ', mid: 'ـفـ', end: 'ـف' },
+                wordAr: 'فَرَاشَة', wordPhonetic: 'Faraasha', wordEn: 'Butterfly', emoji: '🦋'
+            },
+            {
+                square: 22, letter: 'ق', nameEn: 'Qaaf', nameAr: 'قَاف',
+                soundTip: "A deep popping 'Q/K' sound from the back of your tongue, like a cauldron bubbling!",
+                forms: { start: 'قـ', mid: 'ـقـ', end: 'ـق' },
+                wordAr: 'قَلْعَة', wordPhonetic: 'Qal’aa', wordEn: 'Hogwarts Castle', emoji: '🏰'
+            },
+            {
+                square: 23, letter: 'ك', nameEn: 'Kaaf', nameAr: 'كَاف',
+                soundTip: "Sounds just like 'K' in 'Kitten' or 'Key'!",
+                forms: { start: 'كـ', mid: 'ـكـ', end: 'ـك' },
+                wordAr: 'كِتَاب', wordPhonetic: 'Kitaab', wordEn: 'Spellbook', emoji: '📖'
+            },
+            {
+                square: 24, letter: 'ل', nameEn: 'Laam', nameAr: 'لَام',
+                soundTip: "Sounds just like 'L' in 'Lumos' or 'Light'!",
+                forms: { start: 'لـ', mid: 'ـلـ', end: 'ـل' },
+                wordAr: 'لَيْل', wordPhonetic: 'Layl', wordEn: 'Starry Night', emoji: '🌙'
+            },
+            {
+                square: 25, letter: 'م', nameEn: 'Meem', nameAr: 'مِيم',
+                soundTip: "Sounds just like 'M' in 'Magic' or 'Moon'!",
+                forms: { start: 'مـ', mid: 'ـمـ', end: 'ـم' },
+                wordAr: 'مِقَشَّة', wordPhonetic: 'Miqashsha', wordEn: 'Flying Broom', emoji: '🧹'
+            },
+            {
+                square: 26, letter: 'ن', nameEn: 'Noon', nameAr: 'نُون',
+                soundTip: "Sounds just like 'N' in 'Nimbus' or 'Night'! (1 bright star dot above the bowl)",
+                forms: { start: 'نـ', mid: 'ـنـ', end: 'ـن' },
+                wordAr: 'نَجْمَة', wordPhonetic: 'Najma', wordEn: 'Shining Star', emoji: '⭐'
+            },
+            {
+                square: 27, letter: 'هـ', nameEn: 'Haa (Soft)', nameAr: 'هَاء',
+                soundTip: "Soft, gentle 'H' sound like in 'Harry' or 'Hat'!",
+                forms: { start: 'هـ', mid: 'ـهـ', end: 'ـه' },
+                wordAr: 'هَدِيَّة', wordPhonetic: 'Hadiyya', wordEn: 'Magical Gift', emoji: '🎁'
+            },
+            {
+                square: 28, letter: 'و', nameEn: 'Waaw', nameAr: 'وَاو',
+                soundTip: "Sounds just like 'W' in 'Wand' or 'Wizard'!",
+                forms: { start: 'و', mid: 'ـو', end: 'ـو' },
+                wordAr: 'وَرْدَة', wordPhonetic: 'Warda', wordEn: 'Red Rose', emoji: '🌹'
+            },
+            {
+                square: 29, letter: 'ي', nameEn: 'Yaa', nameAr: 'يَاء',
+                soundTip: "Sounds just like 'Y' in 'Yellow' or 'Yes'! (Has 2 dots underneath)",
+                forms: { start: 'يـ', mid: 'ـيـ', end: 'ـي' },
+                wordAr: 'يَد', wordPhonetic: 'Yad', wordEn: 'Helping Hand', emoji: '✋'
+            }
+        ];
+
+        /* =====================================================================
+           2. BROOMS (LADDERS) & SLYTHERIN SNAKES CONFIGURATION
+           ===================================================================== */
+        const BROOMS = {
+            4: 14,   // ت -> ش
+            8: 19,   // خ -> ع
+            15: 26,  // ص -> ن
+            21: 28   // ف -> و
+        };
+
+        const SNAKES = {
+            12: 5,   // ز -> ث
+            18: 9,   // ظ -> د
+            24: 16,  // ل -> ض
+            29: 20   // ي -> غ
+        };
+
+        /* =====================================================================
+           3. 5 ICONIC HARRY POTTER SPELLS (END-OF-BOARD REWARDS)
+           ===================================================================== */
+        const HOGWARTS_SPELLS = [
+            {
+                id: 0,
+                name: "Wingardium Leviosa",
+                arabicTitle: "تعويذة التحليق والطيران",
+                englishSubtitle: "The Levitation Charm",
+                icon: "🪶✨",
+                wandMovement: "Swish and Flick! (لَوِّحي بالعصا السحرية لأعلى)",
+                description: "Makes feathers, magical treasures, and glowing Arabic letters float gracefully up into the sky!",
+                color: "from-amber-500 to-yellow-600"
+            },
+            {
+                id: 1,
+                name: "Lumos Maxima",
+                arabicTitle: "تعويذة النور الساطع",
+                englishSubtitle: "The Wand-Lighting Charm",
+                icon: "💡🪄",
+                wandMovement: "Raise your wand to the sky! (ارفعي العصا لتضيء الظلام)",
+                description: "Illuminates the darkest corners of Hogwarts with a dazzling golden beam that reveals secret glowing Arabic letters!",
+                color: "from-yellow-400 to-amber-500"
+            },
+            {
+                id: 2,
+                name: "Alohomora",
+                arabicTitle: "تعويذة فتح الكنوز والأبواب",
+                englishSubtitle: "The Unlocking Charm",
+                icon: "🗝️🧰",
+                wandMovement: "Key turn motion! (حركة المفتاح السحري)",
+                description: "Unlocks secret Hogwarts doors and magical chests bursting with Gryffindor rubies, diamonds, and House Points!",
+                color: "from-emerald-500 to-teal-700"
+            },
+            {
+                id: 3,
+                name: "Expecto Patronum",
+                arabicTitle: "تعويذة الحارس الفضي",
+                englishSubtitle: "The Patronus Charm",
+                icon: "🦌❄️",
+                wandMovement: "Think of your happiest memory & spin! (فكري في أسعد ذكرى لديكِ)",
+                description: "Summons a shimmering silver guardian Owl & Stag that soars across the screen protecting you from any snake!",
+                color: "from-cyan-400 to-blue-600"
+            },
+            {
+                id: 4,
+                name: "Riddikulus",
+                arabicTitle: "تعويذة المرح والضحك",
+                englishSubtitle: "The Boggart-Banishing Spell",
+                icon: "🎭🐍",
+                wandMovement: "Point and laugh! (أشيري بالعصا واضحكي)",
+                description: "Turns scary Slytherin snakes into hilarious dancing cartoon snakes wearing party hats and funny glasses!",
+                color: "from-pink-500 to-purple-600"
+            }
+        ];
+
+        /* =====================================================================
+           4. BUILT-IN CUTE SVG AVATARS (Harry Potter, Hermione, Hedwig)
+           ===================================================================== */
+        function getAvatarSVG(type) {
+            if (type === 'harry') {
+                // Cute Illustrated Harry Potter with messy black hair, lightning scar, round glasses, and Gryffindor scarf
+                return `
+                <svg viewBox="0 0 100 100" class="w-full h-full">
+                    <defs>
+                        <radialGradient id="hpBg" cx="50%" cy="50%" r="50%">
+                            <stop offset="0%" stop-color="#450a0a"/>
+                            <stop offset="100%" stop-color="#1e1b4b"/>
+                        </radialGradient>
+                    </defs>
+                    <circle cx="50" cy="50" r="48" fill="url(#hpBg)"/>
+                    <!-- Robe & Gryffindor Scarf -->
+                    <path d="M22 92 Q50 75 78 92" fill="#1f2937"/>
+                    <path d="M28 76 Q50 85 72 76 L75 90 Q50 96 25 90 Z" fill="#991b1b" stroke="#fbbf24" stroke-width="2"/>
+                    <rect x="38" y="77" width="6" height="14" fill="#fbbf24"/>
+                    <rect x="54" y="77" width="6" height="14" fill="#fbbf24"/>
+                    <path d="M58 82 L66 96 L54 96 Z" fill="#991b1b" stroke="#fbbf24" stroke-width="1.5"/>
+                    <!-- Face -->
+                    <circle cx="50" cy="52" r="24" fill="#fde68a"/>
+                    <!-- Blush -->
+                    <circle cx="35" cy="57" r="3.5" fill="#f87171" opacity="0.45"/>
+                    <circle cx="65" cy="57" r="3.5" fill="#f87171" opacity="0.45"/>
+                    <!-- Messy Black Hair -->
+                    <path d="M24 50 Q22 25 50 23 Q78 25 76 50 Q72 34 62 37 Q53 28 45 37 Q34 31 24 50 Z" fill="#111827"/>
+                    <path d="M35 25 L30 17 L43 23 L48 15 L55 23 L66 18 L62 27 Z" fill="#111827"/>
+                    <!-- Lightning Bolt Scar -->
+                    <path d="M57 34 L53 40 L57 40 L54 46" stroke="#ef4444" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                    <!-- Round Glasses -->
+                    <circle cx="40" cy="52" r="8.5" fill="rgba(255,255,255,0.2)" stroke="#111827" stroke-width="2.8"/>
+                    <circle cx="60" cy="52" r="8.5" fill="rgba(255,255,255,0.2)" stroke="#111827" stroke-width="2.8"/>
+                    <line x1="48.5" y1="52" x2="51.5" y2="52" stroke="#111827" stroke-width="2.8"/>
+                    <!-- Eyes -->
+                    <circle cx="40" cy="52" r="3.2" fill="#065f46"/>
+                    <circle cx="60" cy="52" r="3.2" fill="#065f46"/>
+                    <circle cx="41" cy="50.5" r="1.2" fill="#ffffff"/>
+                    <circle cx="61" cy="50.5" r="1.2" fill="#ffffff"/>
+                    <!-- Happy Smile -->
+                    <path d="M44 64 Q50 69 56 64" stroke="#78350f" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                </svg>`;
+            } else if (type === 'hermione') {
+                // Cute Illustrated Hermione Granger with bushy brown hair & Gryffindor scarf
+                return `
+                <svg viewBox="0 0 100 100" class="w-full h-full">
+                    <circle cx="50" cy="50" r="48" fill="#311042"/>
+                    <!-- Bushy Wavy Brown Hair Back -->
+                    <circle cx="26" cy="58" r="16" fill="#78350f"/>
+                    <circle cx="74" cy="58" r="16" fill="#78350f"/>
+                    <circle cx="50" cy="36" r="27" fill="#78350f"/>
+                    <!-- Scarf -->
+                    <path d="M28 76 Q50 85 72 76 L75 91 Q50 96 25 91 Z" fill="#991b1b" stroke="#fbbf24" stroke-width="2"/>
+                    <rect x="40" y="78" width="6" height="13" fill="#fbbf24"/>
+                    <rect x="55" y="78" width="6" height="13" fill="#fbbf24"/>
+                    <!-- Face -->
+                    <circle cx="50" cy="53" r="22" fill="#fde68a"/>
+                    <!-- Hair Bangs -->
+                    <path d="M26 48 Q36 28 50 33 Q64 28 74 48 Q64 36 50 38 Q36 36 26 48 Z" fill="#92400e"/>
+                    <!-- Eyes -->
+                    <circle cx="41" cy="52" r="3.5" fill="#451a03"/>
+                    <circle cx="59" cy="52" r="3.5" fill="#451a03"/>
+                    <circle cx="42" cy="50.5" r="1.3" fill="#fff"/>
+                    <circle cx="60" cy="50.5" r="1.3" fill="#fff"/>
+                    <!-- Blush & Smile -->
+                    <circle cx="35" cy="58" r="3.5" fill="#fb7185" opacity="0.5"/>
+                    <circle cx="65" cy="58" r="3.5" fill="#fb7185" opacity="0.5"/>
+                    <path d="M44 63 Q50 68 56 63" stroke="#78350f" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                    <!-- Little Gold Hair Star -->
+                    <circle cx="68" cy="37" r="4" fill="#fbbf24"/>
+                </svg>`;
+            } else {
+                // Hedwig the Snowy Owl carrying a Hogwarts letter
+                return `
+                <svg viewBox="0 0 100 100" class="w-full h-full">
+                    <circle cx="50" cy="50" r="48" fill="#0f172a"/>
+                    <!-- Snowy Owl Body & Head -->
+                    <ellipse cx="50" cy="65" rx="24" ry="22" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+                    <circle cx="50" cy="42" r="21" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+                    <!-- Feather Spots -->
+                    <path d="M42 62 Q45 65 48 62 M54 62 Q57 65 60 62 M46 70 Q50 73 54 70" stroke="#64748b" stroke-width="2" fill="none" stroke-linecap="round"/>
+                    <!-- Big Amber Owl Eyes -->
+                    <circle cx="41" cy="42" r="7" fill="#fbbf24" stroke="#1e293b" stroke-width="2"/>
+                    <circle cx="59" cy="42" r="7" fill="#fbbf24" stroke="#1e293b" stroke-width="2"/>
+                    <circle cx="41" cy="42" r="3.5" fill="#0f172a"/>
+                    <circle cx="59" cy="42" r="3.5" fill="#0f172a"/>
+                    <circle cx="42.5" cy="40.5" r="1.4" fill="#fff"/>
+                    <circle cx="60.5" cy="40.5" r="1.4" fill="#fff"/>
+                    <!-- Beak -->
+                    <polygon points="47,47 53,47 50,53" fill="#f59e0b"/>
+                    <!-- Hogwarts Letter in Beak -->
+                    <rect x="37" y="53" width="26" height="16" rx="2" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+                    <polyline points="37,53 50,62 63,53" fill="none" stroke="#d97706" stroke-width="1.5"/>
+                    <circle cx="50" cy="61" r="3" fill="#dc2626"/>
+                </svg>`;
+            }
+        }
+
+        /* =====================================================================
+           5. GAME STATE VARIABLES
+           ===================================================================== */
+        let gameState = {
+            playerCount: 1,
+            currentTurn: 0,
+            boardRound: 1,
+            housePoints: 0,
+            isMoving: false,
+            unlockedSpells: [0], // Starts with Wingardium Leviosa ready or unlocked on Board 1
+            players: [
+                { id: 0, name: "Little Witch ⚡", position: 1, avatarType: 'harry', customImage: null },
+                { id: 1, name: "Professor 🦉", position: 1, avatarType: 'hermione', customImage: null }
+            ]
+        };
+
+        let currentUnlockedSpellIndex = 0;
+        let activeModalSquareData = null;
+        let activeModalMode = 'normal'; // 'normal', 'broom', 'snake'
+        let currentQuizCorrectAnswer = null;
+
+        // Load saved spells & points from localStorage if available
+        try {
+            const savedSpells = localStorage.getItem('hogwarts_arabic_spells');
+            if (savedSpells) {
+                gameState.unlockedSpells = JSON.parse(savedSpells);
+            } else {
+                gameState.unlockedSpells = [];
+            }
+            const savedPoints = localStorage.getItem('hogwarts_arabic_points');
+            if (savedPoints) {
+                gameState.housePoints = parseInt(savedPoints, 10) || 0;
+            }
+        } catch (e) {
+            gameState.unlockedSpells = [];
+        }
+
+        /* =====================================================================
+           6. WEB AUDIO API: BUILT-IN HEDWIG'S THEME SYNTHESIZER & SOUND EFFECTS
+              + SMART AUDIO DUCKING
+           ===================================================================== */
+        let audioCtx = null;
+        let isMusicPlaying = true;
+        let isSfxEnabled = true;
+        let isMusicDucked = false;
+        let hedwigTimer = null;
+        let hedwigNoteIndex = 0;
+        let customAudioElement = null;
+
+        // Iconic Hedwig's Theme Melody Notes (Celesta / Magical Music Box)
+        // Frequencies in Hz + duration in beats
+        const HEDWIG_MELODY = [
+            { f: 493.88, d: 1.0 },  // B4
+            { f: 659.25, d: 1.5 },  // E5
+            { f: 783.99, d: 0.5 },  // G5
+            { f: 739.99, d: 1.0 },  // F#5
+            { f: 659.25, d: 2.0 },  // E5
+            { f: 987.77, d: 1.0 },  // B5
+            { f: 880.00, d: 2.5 },  // A5
+            { f: 739.99, d: 2.5 },  // F#5
+
+            { f: 659.25, d: 1.5 },  // E5
+            { f: 783.99, d: 0.5 },  // G5
+            { f: 739.99, d: 1.0 },  // F#5
+            { f: 622.25, d: 2.0 },  // D#5
+            { f: 698.46, d: 1.0 },  // F5
+            { f: 493.88, d: 3.0 },  // B4
+            { f: 0,      d: 1.0 },  // Gentle pause
+
+            { f: 493.88, d: 1.0 },  // B4
+            { f: 659.25, d: 1.5 },  // E5
+            { f: 783.99, d: 0.5 },  // G5
+            { f: 739.99, d: 1.0 },  // F#5
+            { f: 659.25, d: 2.0 },  // E5
+            { f: 987.77, d: 1.0 },  // B5
+            { f: 1174.66, d: 2.0 }, // D6
+            { f: 1108.73, d: 1.0 }, // C#6
+            { f: 1046.50, d: 2.0 }, // C6
+
+            { f: 830.61, d: 1.0 },  // G#5
+            { f: 1046.50, d: 1.5 }, // C6
+            { f: 987.77, d: 0.5 },  // B5
+            { f: 932.33, d: 1.0 },  // A#5
+            { f: 698.46, d: 2.0 },  // F#4/F5
+            { f: 783.99, d: 1.0 },  // G5
+            { f: 659.25, d: 3.0 },  // E5
+            { f: 0,      d: 1.5 }   // Pause before loop
+        ];
+
+        function initAudioContext() {
+            if (!audioCtx) {
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                if (AudioContextClass) {
+                    audioCtx = new AudioContextClass();
+                }
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playCelestaNote(freq, durationSec) {
+            if (!audioCtx || !isMusicPlaying || freq <= 0) return;
+            try {
+                const now = audioCtx.currentTime;
+                // Music box / Celesta bell-like tone using sine + soft overtone
+                const osc1 = audioCtx.createOscillator();
+                const osc2 = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+
+                osc1.type = 'sine';
+                osc2.type = 'triangle';
+                osc1.frequency.setValueAtTime(freq, now);
+                osc2.frequency.setValueAtTime(freq * 2, now); // Octave harmonic for bell sparkle
+
+                // Smart ducking lowers volume when Arabic speech or quiz card is open
+                const peakVol = isMusicDucked ? 0.018 : 0.075;
+
+                gain.gain.setValueAtTime(0.001, now);
+                gain.gain.linearRampToValueAtTime(peakVol, now + 0.03);
+                gain.gain.exponentialRampToValueAtTime(0.0008, now + durationSec * 1.25);
+
+                osc1.connect(gain);
+                osc2.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc1.start(now);
+                osc2.start(now);
+                osc1.stop(now + durationSec * 1.3);
+                osc2.stop(now + durationSec * 1.3);
+            } catch (e) {}
+        }
+
+        function scheduleNextHedwigNote() {
+            if (!isMusicPlaying) return;
+            if (customAudioElement) return; // Using uploaded MP3 instead
+
+            const note = HEDWIG_MELODY[hedwigNoteIndex];
+            const beatMs = 310; // Magical waltz tempo
+            const durationSec = (note.d * beatMs) / 1000;
+
+            if (note.f > 0) {
+                playCelestaNote(note.f, durationSec);
+            }
+
+            hedwigNoteIndex = (hedwigNoteIndex + 1) % HEDWIG_MELODY.length;
+            hedwigTimer = setTimeout(scheduleNextHedwigNote, note.d * beatMs);
+        }
+
+        function startBackgroundMusic() {
+            initAudioContext();
+            if (!isMusicPlaying) return;
+
+            if (customAudioElement) {
+                customAudioElement.volume = isMusicDucked ? 0.12 : 0.45;
+                customAudioElement.play().catch(() => {});
+                return;
+            }
+
+            clearTimeout(hedwigTimer);
+            scheduleNextHedwigNote();
+        }
+
+        function setMusicDucking(ducked) {
+            isMusicDucked = ducked;
+            if (customAudioElement) {
+                customAudioElement.volume = ducked ? 0.1 : 0.45;
+            }
+        }
+
+        function toggleBackgroundMusic() {
+            initAudioContext();
+            isMusicPlaying = !isMusicPlaying;
+            const iconEl = document.getElementById('musicIcon');
+            const textEl = document.getElementById('musicStatusText');
+
+            if (isMusicPlaying) {
+                iconEl.textContent = '🎵';
+                textEl.textContent = 'Music: ON';
+                startBackgroundMusic();
+            } else {
+                iconEl.textContent = '🔇';
+                textEl.textContent = 'Music: OFF';
+                clearTimeout(hedwigTimer);
+                if (customAudioElement) customAudioElement.pause();
+            }
+        }
+
+        function toggleSFX() {
+            isSfxEnabled = !isSfxEnabled;
+            document.getElementById('sfxIcon').textContent = isSfxEnabled ? '🔊' : '🔈';
+        }
+
+        function handleCustomMusicUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            clearTimeout(hedwigTimer);
+            if (customAudioElement) {
+                customAudioElement.pause();
+            }
+            const url = URL.createObjectURL(file);
+            customAudioElement = new Audio(url);
+            customAudioElement.loop = true;
+            customAudioElement.volume = 0.45;
+            if (isMusicPlaying) {
+                customAudioElement.play().catch(() => {});
+            }
+        }
+
+        // Synthesized Magical Sound Effects
+        function playSFX(type) {
+            if (!isSfxEnabled) return;
+            initAudioContext();
+            if (!audioCtx) return;
+
+            const now = audioCtx.currentTime;
+
+            if (type === 'hop') {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(380, now);
+                osc.frequency.exponentialRampToValueAtTime(680, now + 0.14);
+                gain.gain.setValueAtTime(0.12, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(now);
+                osc.stop(now + 0.15);
+            } else if (type === 'wand') {
+                const notes = [587.33, 880, 1174.66, 1567.98];
+                notes.forEach((f, i) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(f, now + i * 0.06);
+                    gain.gain.setValueAtTime(0.1, now + i * 0.06);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.06 + 0.35);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now + i * 0.06);
+                    osc.stop(now + i * 0.06 + 0.36);
+                });
+            } else if (type === 'broom') {
+                // Rising magical sweep
+                const notes = [440, 554.37, 659.25, 880, 1108.73, 1318.51];
+                notes.forEach((f, i) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(f, now + i * 0.08);
+                    gain.gain.setValueAtTime(0.13, now + i * 0.08);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.08 + 0.4);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now + i * 0.08);
+                    osc.stop(now + i * 0.08 + 0.42);
+                });
+            } else if (type === 'shield') {
+                // Powerful Protego chord
+                const chord = [523.25, 659.25, 783.99, 1046.5];
+                chord.forEach((f) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(f, now);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.85);
+                });
+            } else if (type === 'snake') {
+                // Descending slide sound
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(420, now);
+                osc.frequency.linearRampToValueAtTime(160, now + 0.55);
+                gain.gain.setValueAtTime(0.08, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(now);
+                osc.stop(now + 0.6);
+            } else if (type === 'fanfare') {
+                const notes = [523.25, 659.25, 783.99, 1046.50, 783.99, 1046.50];
+                const times = [0, 0.14, 0.28, 0.42, 0.60, 0.78];
+                notes.forEach((f, idx) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(f, now + times[idx]);
+                    gain.gain.setValueAtTime(0.15, now + times[idx]);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + times[idx] + 0.45);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now + times[idx]);
+                    osc.stop(now + times[idx] + 0.5);
+                });
+            }
+        }
+
+        /* =====================================================================
+           7. ARABIC SPEECH SYNTHESIS (Pronounces Letter & Example Word)
+           ===================================================================== */
+        function speakArabicText(text) {
+            if (!('speechSynthesis' in window)) return;
+            setMusicDucking(true);
+            window.speechSynthesis.cancel();
+
+            const utter = new SpeechSynthesisUtterance(text);
+            utter.lang = 'ar-SA';
+            utter.rate = 0.85; // Slightly slower & clearer for a young child
+
+            const voices = window.speechSynthesis.getVoices();
+            const arabicVoice = voices.find(v => v.lang && v.lang.toLowerCase().startsWith('ar'));
+            if (arabicVoice) {
+                utter.voice = arabicVoice;
+            }
+
+            utter.onend = () => {
+                // Restore music volume if modal is closed
+                if (document.getElementById('letterCardModal').classList.contains('hidden')) {
+                    setMusicDucking(false);
+                }
+            };
+            utter.onerror = () => {
+                if (document.getElementById('letterCardModal').classList.contains('hidden')) {
+                    setMusicDucking(false);
+                }
+            };
+
+            window.speechSynthesis.speak(utter);
+        }
+
+        function speakCurrentModalLetter() {
+            if (!activeModalSquareData) return;
+            playSFX('wand');
+            speakArabicText(`${activeModalSquareData.nameAr} ... ${activeModalSquareData.wordAr}`);
+        }
+
+        /* =====================================================================
+           8. BUILDING THE 30-SQUARE ZIG-ZAG BOARD & SVG BROOMS/SNAKES
+           ===================================================================== */
+        // Converts Square Number (1..30) to Grid Row (0..4 from top) and Col (0..5 from left)
+        function getSquareGridCoords(sqNum) {
+            const zeroBased = sqNum - 1;
+            const rowFromBottom = Math.floor(zeroBased / 6); // 0 to 4
+            const rowFromTop = 4 - rowFromBottom;            // 4 (bottom) to 0 (top)
+            const posInRow = zeroBased % 6;
+            // Even rows from bottom go Left-to-Right (0->5); Odd rows go Right-to-Left (5->0)
+            const col = (rowFromBottom % 2 === 0) ? posInRow : (5 - posInRow);
+            return { row: rowFromTop, col: col };
+        }
+
+        // Returns percentage center { xPercent, yPercent } of a square (1..30)
+        function getSquareCenterPercent(sqNum) {
+            const { row, col } = getSquareGridCoords(sqNum);
+            const xPercent = ((col + 0.5) / 6) * 100;
+            const yPercent = ((row + 0.5) / 5) * 100;
+            return { xPercent, yPercent };
+        }
+
+        function buildBoardGrid() {
+            const gridEl = document.getElementById('boardGrid');
+            gridEl.innerHTML = '';
+
+            // Create 30 cells ordered by visual grid row (0..4) and col (0..5)
+            for (let r = 0; r < 5; r++) {
+                const rowFromBottom = 4 - r;
+                for (let c = 0; c < 6; c++) {
+                    const posInRow = (rowFromBottom % 2 === 0) ? c : (5 - c);
+                    const sqNum = rowFromBottom * 6 + posInRow + 1;
+
+                    const cell = document.createElement('div');
+                    cell.id = `board-sq-${sqNum}`;
+                    cell.dataset.square = sqNum;
+
+                    let baseClass = `board-square ${(sqNum % 2 === 0) ? 'square-even' : 'square-odd'}`;
+                    if (sqNum === 1) baseClass += ' square-start';
+                    else if (sqNum === 30) baseClass += ' square-finish';
+                    else if (BROOMS[sqNum]) baseClass += ' square-broom';
+                    else if (SNAKES[sqNum]) baseClass += ' square-snake';
+
+                    cell.className = baseClass;
+
+                    // Populate Square Content
+                    if (sqNum === 1) {
+                        cell.innerHTML = `
+                            <span class="absolute top-1 left-1.5 text-[10px] sm:text-xs font-extrabold text-amber-300">#1</span>
+                            <div class="text-2xl sm:text-4xl">🚂</div>
+                            <div class="text-[10px] sm:text-xs font-extrabold text-amber-200 text-center leading-tight">Platform 9¾</div>
+                            <div class="font-arabic text-[10px] text-amber-300 font-bold">البداية</div>
+                        `;
+                    } else if (sqNum === 30) {
+                        cell.innerHTML = `
+                            <span class="absolute top-1 left-1.5 text-[10px] sm:text-xs font-extrabold text-yellow-200">#30</span>
+                            <div class="text-2xl sm:text-4xl float-slow">🏰🏆</div>
+                            <div class="text-[10px] sm:text-xs font-extrabold text-yellow-200 text-center leading-tight">Hogwarts!</div>
+                            <div class="font-arabic text-[10px] text-yellow-100 font-bold">تعويذة جديدة ✨</div>
+                        `;
+                    } else {
+                        const letterObj = ARABIC_LETTERS.find(l => l.square === sqNum);
+                        let badgeHtml = '';
+                        if (BROOMS[sqNum]) {
+                            badgeHtml = `<span class="absolute top-0.5 right-1 bg-amber-400 text-slate-950 px-1 rounded text-[9px] sm:text-[10px] font-black shadow">🧹↑${BROOMS[sqNum]}</span>`;
+                        } else if (SNAKES[sqNum]) {
+                            badgeHtml = `<span class="absolute top-0.5 right-1 bg-emerald-400 text-slate-950 px-1 rounded text-[9px] sm:text-[10px] font-black shadow">🐍↓${SNAKES[sqNum]}</span>`;
+                        }
+
+                        cell.innerHTML = `
+                            <span class="absolute top-0.5 left-1 text-[9px] sm:text-[11px] font-bold text-amber-200/75">${sqNum}</span>
+                            ${badgeHtml}
+                            <div class="font-arabic text-2xl sm:text-4xl font-black text-amber-300 gold-glow-text leading-none mt-2">${letterObj.letter}</div>
+                            <div class="text-[9px] sm:text-[11px] font-bold text-amber-100/90 mt-0.5">${letterObj.nameEn}</div>
+                            <div class="text-xs sm:text-sm leading-none">${letterObj.emoji}</div>
+                        `;
+
+                        // Clicking any letter square lets the student/teacher hear and inspect the letter anytime
+                        cell.addEventListener('click', () => {
+                            if (gameState.isMoving) return;
+                            speakArabicText(`${letterObj.nameAr} ... ${letterObj.wordAr}`);
+                            createSparkleBurst(cell);
+                        });
+                    }
+
+                    gridEl.appendChild(cell);
+                }
+            }
+
+            drawBoardConnectorsSVG();
+        }
+
+        function drawBoardConnectorsSVG() {
+            const svg = document.getElementById('boardConnectorsSvg');
+            let svgContent = `
+                <defs>
+                    <linearGradient id="broomGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.85"/>
+                        <stop offset="100%" stop-color="#fef08a" stop-opacity="0.95"/>
+                    </linearGradient>
+                    <linearGradient id="snakeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#10b981" stop-opacity="0.85"/>
+                        <stop offset="100%" stop-color="#047857" stop-opacity="0.85"/>
+                    </linearGradient>
+                </defs>
+            `;
+
+            // Draw Flying Broomsticks (Ladders)
+            Object.entries(BROOMS).forEach(([startSq, endSq]) => {
+                const p1 = getSquareCenterPercent(parseInt(startSq));
+                const p2 = getSquareCenterPercent(parseInt(endSq));
+                const x1 = (p1.xPercent / 100) * 600;
+                const y1 = (p1.yPercent / 100) * 500;
+                const x2 = (p2.xPercent / 100) * 600;
+                const y2 = (p2.yPercent / 100) * 500;
+
+                // Slight curve for flying broom trail
+                const cx = (x1 + x2) / 2 - 20;
+                const cy = (y1 + y2) / 2;
+
+                svgContent += `
+                    <path d="M ${x1} ${y1} Q ${cx} ${cy} ${x2} ${y2}" fill="none" stroke="url(#broomGrad)" stroke-width="5" stroke-dasharray="8 5" stroke-linecap="round" opacity="0.75"/>
+                    <circle cx="${x2}" cy="${y2}" r="6" fill="#fef08a" opacity="0.85"/>
+                `;
+            });
+
+            // Draw Slytherin Snakes
+            Object.entries(SNAKES).forEach(([headSq, tailSq]) => {
+                const p1 = getSquareCenterPercent(parseInt(headSq));
+                const p2 = getSquareCenterPercent(parseInt(tailSq));
+                const x1 = (p1.xPercent / 100) * 600;
+                const y1 = (p1.yPercent / 100) * 500;
+                const x2 = (p2.xPercent / 100) * 600;
+                const y2 = (p2.yPercent / 100) * 500;
+
+                const midX1 = x1 + (x2 - x1) * 0.33 + 35;
+                const midY1 = y1 + (y2 - y1) * 0.33;
+                const midX2 = x1 + (x2 - x1) * 0.66 - 35;
+                const midY2 = y1 + (y2 - y1) * 0.66;
+
+                svgContent += `
+                    <path d="M ${x1} ${y1} C ${midX1} ${midY1}, ${midX2} ${midY2}, ${x2} ${y2}" fill="none" stroke="url(#snakeGrad)" stroke-width="6" stroke-linecap="round" opacity="0.72"/>
+                    <circle cx="${x1}" cy="${y1}" r="7" fill="#10b981" opacity="0.85"/>
+                `;
+            });
+
+            svg.innerHTML = svgContent;
+        }
+
+        /* =====================================================================
+           9. AVATAR & PLAYER TOKEN RENDERING AND MOVEMENT
+           ===================================================================== */
+        function renderPlayerTokens() {
+            gameState.players.forEach((player, idx) => {
+                const tokenEl = document.getElementById(`playerToken${idx}`);
+                if (idx === 1 && gameState.playerCount === 1) {
+                    tokenEl.classList.add('hidden');
+                    return;
+                }
+                tokenEl.classList.remove('hidden');
+
+                let avatarInner = '';
+                if (player.customImage) {
+                    avatarInner = `<img src="${player.customImage}" class="w-full h-full object-cover rounded-full" alt="Player Avatar">`;
+                } else {
+                    avatarInner = `<div class="w-full h-full rounded-full overflow-hidden">${getAvatarSVG(player.avatarType)}</div>`;
+                }
+
+                // Name tag underneath the token
+                const badgeColor = idx === 0 ? 'bg-amber-400 text-slate-950' : 'bg-emerald-400 text-slate-950';
+                tokenEl.innerHTML = `
+                    ${avatarInner}
+                    <span class="absolute -bottom-2.5 left-1/2 -translate-x-1/2 ${badgeColor} px-1.5 py-0.2 rounded-full text-[9px] font-extrabold whitespace-nowrap shadow border border-white">
+                        ${player.name}
+                    </span>
+                `;
+
+                updateTokenPositionOnBoard(idx, false);
+            });
+
+            updateSidebarPlayersUI();
+        }
+
+        function updateTokenPositionOnBoard(playerIdx, animateType = false) {
+            const player = gameState.players[playerIdx];
+            const tokenEl = document.getElementById(`playerToken${playerIdx}`);
+            const { xPercent, yPercent } = getSquareCenterPercent(player.position);
+
+            // Slight offset if both players are on the exact same square in 2P mode
+            let offsetX = 0;
+            let offsetY = 0;
+            if (gameState.playerCount === 2 && gameState.players[0].position === gameState.players[1].position) {
+                offsetX = (playerIdx === 0) ? -2.2 : 2.2;
+                offsetY = (playerIdx === 0) ? -1.5 : 1.5;
+            }
+
+            tokenEl.classList.remove('token-hopping', 'token-flying', 'token-sliding');
+            void tokenEl.offsetWidth; // Reflow to restart animation
+
+            if (animateType === 'hop') {
+                tokenEl.classList.add('token-hopping');
+            } else if (animateType === 'fly') {
+                tokenEl.classList.add('token-flying');
+            } else if (animateType === 'slide') {
+                tokenEl.classList.add('token-sliding');
+            }
+
+            tokenEl.style.left = `${xPercent + offsetX}%`;
+            tokenEl.style.top = `${yPercent + offsetY}%`;
+        }
+
+        function updateSidebarPlayersUI() {
+            const container = document.getElementById('playersStatusContainer');
+            container.innerHTML = '';
+
+            const activePlayers = gameState.playerCount === 1 ? [gameState.players[0]] : gameState.players;
+
+            activePlayers.forEach((p, idx) => {
+                const isTurn = gameState.currentTurn === idx;
+                const borderClass = isTurn
+                    ? 'border-2 border-amber-400 bg-amber-500/20 shadow-[0_0_15px_rgba(251,191,36,0.25)]'
+                    : 'border border-amber-400/25 bg-slate-900/60 opacity-80';
+
+                const currentLetterObj = ARABIC_LETTERS.find(l => l.square === p.position);
+                const posLabel = p.position === 1
+                    ? 'Platform 9¾ (Start)'
+                    : p.position === 30
+                    ? 'Hogwarts Castle 🏆'
+                    : `Square #${p.position} — حرف (${currentLetterObj.letter})`;
+
+                const miniAvatar = p.customImage
+                    ? `<img src="${p.customImage}" class="w-10 h-10 rounded-full object-cover border-2 border-amber-400">`
+                    : `<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-amber-400">${getAvatarSVG(p.avatarType)}</div>`;
+
+                container.innerHTML += `
+                    <div class="${borderClass} rounded-xl p-2.5 flex items-center justify-between transition">
+                        <div class="flex items-center gap-2.5">
+                            ${miniAvatar}
+                            <div>
+                                <div class="text-xs sm:text-sm font-extrabold text-amber-200 flex items-center gap-1.5">
+                                    <span>${p.name}</span>
+                                    ${isTurn ? '<span class="text-[10px] bg-amber-400 text-slate-950 px-1.5 py-0.2 rounded-full font-black">TURN</span>' : ''}
+                                </div>
+                                <div class="text-xs text-amber-100/80 font-arabic font-bold">${posLabel}</div>
+                            </div>
+                        </div>
+                        <div class="text-lg font-black text-amber-300">#${p.position}</div>
+                    </div>
+                `;
+            });
+
+            const currentPlayer = gameState.players[gameState.currentTurn];
+            document.getElementById('turnTitleText').textContent = `${currentPlayer.name}'s Turn`;
+            document.getElementById('hudPointsDisplay').textContent = `${gameState.housePoints} pts`;
+            document.getElementById('spellCountBadge').textContent = `${gameState.unlockedSpells.length}/5`;
+            document.getElementById('boardLevelBadge').textContent = `Board #${gameState.boardRound} 🌟`;
+        }
+
+        function addHousePoints(points) {
+            gameState.housePoints += points;
+            try {
+                localStorage.setItem('hogwarts_arabic_points', String(gameState.housePoints));
+            } catch (e) {}
+            updateSidebarPlayersUI();
+        }
+
+        /* =====================================================================
+           10. ROLLING THE MAGICAL WAND & STEP-BY-STEP HOPPING
+           ===================================================================== */
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        async function rollMagicalWand() {
+            if (gameState.isMoving) return;
+            initAudioContext();
+            gameState.isMoving = true;
+
+            const rollBtn = document.getElementById('rollWandBtn');
+            const diceBox = document.getElementById('magicDiceBox');
+            const diceValEl = document.getElementById('diceValueDisplay');
+            rollBtn.disabled = true;
+
+            playSFX('wand');
+
+            // Roll animation (1 to 4 so the child visits lots of letters!)
+            diceBox.classList.add('scale-110', 'rotate-12');
+            for (let i = 0; i < 8; i++) {
+                diceValEl.textContent = Math.floor(Math.random() * 4) + 1;
+                await sleep(55);
+            }
+            const steps = Math.floor(Math.random() * 4) + 1;
+            diceValEl.textContent = steps;
+            diceBox.classList.remove('scale-110', 'rotate-12');
+
+            document.getElementById('dicePromptText').textContent = `Moving ${steps} magical steps! (تحركي ${steps} خطوات)`;
+
+            const pIdx = gameState.currentTurn;
+            const player = gameState.players[pIdx];
+
+            // Hop step-by-step across the board!
+            for (let s = 0; s < steps; s++) {
+                if (player.position < 30) {
+                    player.position++;
+                    playSFX('hop');
+                    updateTokenPositionOnBoard(pIdx, 'hop');
+                    updateSidebarPlayersUI();
+                    await sleep(410);
+                }
+            }
+
+            // Check what square the player landed on
+            await handleLandedSquare(pIdx);
+        }
+
+        async function handleLandedSquare(playerIdx) {
+            const player = gameState.players[playerIdx];
+            const sq = player.position;
+
+            if (sq === 30) {
+                // Reached Hogwarts Castle! Unlock a new Harry Potter Spell!
+                handleBoardVictory();
+                return;
+            }
+
+            const letterObj = ARABIC_LETTERS.find(l => l.square === sq);
+            if (!letterObj) {
+                finishTurn();
+                return;
+            }
+
+            if (BROOMS[sq]) {
+                openLetterChallengeModal(letterObj, 'broom');
+            } else if (SNAKES[sq]) {
+                openLetterChallengeModal(letterObj, 'snake');
+            } else {
+                openLetterChallengeModal(letterObj, 'normal');
+            }
+        }
+
+        /* =====================================================================
+           11. HOGWARTS LETTER CARD & EDUCATIONAL MINI-QUIZ
+           ===================================================================== */
+        function openLetterChallengeModal(letterObj, mode) {
+            activeModalSquareData = letterObj;
+            activeModalMode = mode;
+            setMusicDucking(true);
+
+            const modal = document.getElementById('letterCardModal');
+            const banner = document.getElementById('cardBanner');
+            const bannerIcon = document.getElementById('cardBannerIcon');
+            const bannerTitle = document.getElementById('cardBannerTitle');
+            const bannerSub = document.getElementById('cardBannerSubtitle');
+
+            document.getElementById('cardSquareBadge').textContent = `Square #${letterObj.square}`;
+            document.getElementById('modalArabicLetter').textContent = letterObj.letter;
+            document.getElementById('modalLetterName').textContent = `${letterObj.nameEn} (${letterObj.nameAr})`;
+            document.getElementById('modalWordArabic').textContent = letterObj.wordAr;
+            document.getElementById('modalWordPhonetic').textContent = `(${letterObj.wordPhonetic})`;
+            document.getElementById('modalWordEnglish').textContent = letterObj.wordEn;
+            document.getElementById('modalWordEmoji').textContent = letterObj.emoji;
+            document.getElementById('modalPronunciationTip').textContent = letterObj.soundTip;
+
+            document.getElementById('formStart').textContent = letterObj.forms.start;
+            document.getElementById('formMiddle').textContent = letterObj.forms.mid;
+            document.getElementById('formEnd').textContent = letterObj.forms.end;
+
+            // Customize Banner based on Normal, Flying Broom, or Slytherin Snake Shield
+            if (mode === 'broom') {
+                const dest = BROOMS[letterObj.square];
+                banner.className = 'rounded-2xl px-4 py-2.5 mb-4 flex items-center justify-between border-2 border-amber-400 bg-gradient-to-r from-amber-900/80 to-yellow-900/70';
+                bannerIcon.textContent = '🧹✨';
+                bannerTitle.textContent = `Flying Broom Found! Fly to Square #${dest}!`;
+                bannerSub.textContent = `وجدتِ مقشة طائرة! جاوبي صح لتطيري إلى مربع ${dest}!`;
+            } else if (mode === 'snake') {
+                const dest = SNAKES[letterObj.square];
+                banner.className = 'rounded-2xl px-4 py-2.5 mb-4 flex items-center justify-between border-2 border-emerald-400 bg-gradient-to-r from-emerald-950/90 to-teal-900/80';
+                bannerIcon.textContent = '🐍🛡️';
+                bannerTitle.textContent = `Slytherin Snake! Cast PROTEGO Shield!`;
+                bannerSub.textContent = `ثعبان سليذرين! جاوبي صح لتفعلي تعويذة الحماية ولا تنزلي لمربع ${dest}!`;
+            } else {
+                banner.className = 'rounded-2xl px-4 py-2.5 mb-4 flex items-center justify-between border border-amber-400/50 bg-indigo-950/80';
+                bannerIcon.textContent = '🪄🌟';
+                bannerTitle.textContent = `Hogwarts Letter Spell (+10 House Points)`;
+                bannerSub.textContent = `تعرفي على الحرف السحري واكسبي ١٠ نقاط لكأس هوجورتس!`;
+            }
+
+            // Generate 3-Choice Educational Mini-Quiz
+            buildMiniQuizForLetter(letterObj);
+
+            const feedbackBox = document.getElementById('quizFeedbackBox');
+            feedbackBox.classList.add('hidden');
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+
+            // Automatically pronounce the Arabic letter & word after a short moment
+            setTimeout(() => {
+                speakCurrentModalLetter();
+            }, 250);
+        }
+
+        function buildMiniQuizForLetter(letterObj) {
+            const qTextEl = document.getElementById('quizQuestionText');
+            const optionsContainer = document.getElementById('quizOptionsContainer');
+            optionsContainer.innerHTML = '';
+
+            // Pick 2 random distractor letters different from current letter
+            const otherLetters = ARABIC_LETTERS.filter(l => l.square !== letterObj.square);
+            const shuffledOthers = otherLetters.sort(() => Math.random() - 0.5).slice(0, 2);
+
+            // Alternate quiz types to practice Sound recognition, Word beginning, and Transfiguration shapes
+            const quizType = Math.floor(Math.random() * 3);
+            let choices = [];
+
+            if (quizType === 0) {
+                qTextEl.innerHTML = `Which Arabic letter makes the <span class="text-amber-300 underline">"${letterObj.nameEn}"</span> sound (as in ${letterObj.wordEn} ${letterObj.emoji})?`;
+                currentQuizCorrectAnswer = letterObj.letter;
+                choices = [letterObj.letter, shuffledOthers[0].letter, shuffledOthers[1].letter];
+            } else if (quizType === 1) {
+                qTextEl.innerHTML = `✨ <b>Transfiguration Class:</b> How does <span class="text-amber-300 font-arabic text-lg">(${letterObj.letter})</span> look at the <b>beginning</b> of a word?`;
+                currentQuizCorrectAnswer = letterObj.forms.start;
+                choices = [letterObj.forms.start, shuffledOthers[0].forms.start, shuffledOthers[1].forms.start];
+            } else {
+                qTextEl.innerHTML = `Which letter does the word <span class="text-amber-300 font-arabic text-lg">${letterObj.wordAr}</span> (${letterObj.wordEn} ${letterObj.emoji}) start with?`;
+                currentQuizCorrectAnswer = letterObj.letter;
+                choices = [letterObj.letter, shuffledOthers[0].letter, shuffledOthers[1].letter];
+            }
+
+            // Shuffle the 3 choices
+            choices.sort(() => Math.random() - 0.5);
+
+            choices.forEach(choiceText => {
+                const btn = document.createElement('button');
+                btn.className = 'quiz-opt-btn bg-slate-900 hover:bg-amber-500/25 border-2 border-amber-400/60 hover:border-amber-300 rounded-2xl py-3 px-2 font-arabic text-3xl sm:text-4xl font-black text-amber-200 shadow-lg transition transform hover:-translate-y-1';
+                btn.textContent = choiceText;
+                btn.onclick = () => handleQuizAnswer(choiceText, btn);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        async function handleQuizAnswer(selectedText, btnEl) {
+            const isCorrect = (selectedText === currentQuizCorrectAnswer);
+            const feedbackBox = document.getElementById('quizFeedbackBox');
+            const allButtons = document.querySelectorAll('.quiz-opt-btn');
+
+            if (isCorrect) {
+                allButtons.forEach(b => b.disabled = true);
+                btnEl.classList.remove('bg-slate-900');
+                btnEl.classList.add('bg-emerald-600', 'border-white', 'text-white', 'scale-105');
+                createSparkleBurst(btnEl);
+
+                addHousePoints(10);
+                feedbackBox.classList.remove('hidden');
+                feedbackBox.className = 'mt-3 p-3 rounded-xl text-center font-bold text-sm bg-emerald-900/90 border border-emerald-400 text-emerald-100';
+
+                const pIdx = gameState.currentTurn;
+                const player = gameState.players[pIdx];
+
+                if (activeModalMode === 'broom') {
+                    const targetSq = BROOMS[player.position];
+                    playSFX('broom');
+                    feedbackBox.innerHTML = `🌟 Brilliant! +10 Points! Flying up on your Broomstick to Square #${targetSq}! 🧹✨`;
+                    await sleep(1300);
+                    closeLetterModal();
+                    player.position = targetSq;
+                    updateTokenPositionOnBoard(pIdx, 'fly');
+                    updateSidebarPlayersUI();
+                    await sleep(1150);
+                    finishTurn();
+                } else if (activeModalMode === 'snake') {
+                    playSFX('shield');
+                    feedbackBox.innerHTML = `🛡️ PROTEGO! Your Shield Spell blocked the Slytherin Snake! +10 Points & you stay safe! ⚡`;
+                    await sleep(1500);
+                    closeLetterModal();
+                    finishTurn();
+                } else {
+                    playSFX('wand');
+                    feedbackBox.innerHTML = `⚡ 10 Points to Hogwarts! Spell Cast Perfectly! أحسنتِ يا بطلة!`;
+                    await sleep(1200);
+                    closeLetterModal();
+                    finishTurn();
+                }
+            } else {
+                // If wrong on a Snake square, slide down; on normal/broom, let her try again or show gentle guidance
+                if (activeModalMode === 'snake') {
+                    allButtons.forEach(b => b.disabled = true);
+                    btnEl.classList.add('bg-red-800', 'border-red-400');
+                    const pIdx = gameState.currentTurn;
+                    const player = gameState.players[pIdx];
+                    const targetSq = SNAKES[player.position];
+
+                    playSFX('snake');
+                    feedbackBox.classList.remove('hidden');
+                    feedbackBox.className = 'mt-3 p-3 rounded-xl text-center font-bold text-sm bg-amber-950/90 border border-amber-400 text-amber-200';
+                    feedbackBox.innerHTML = `🐍 Oops! The answer was <span class="font-arabic text-lg text-amber-300">(${currentQuizCorrectAnswer})</span>. The snake slides you down to Square #${targetSq}!`;
+
+                    await sleep(1700);
+                    closeLetterModal();
+                    player.position = targetSq;
+                    updateTokenPositionOnBoard(pIdx, 'slide');
+                    updateSidebarPlayersUI();
+                    await sleep(1150);
+                    finishTurn();
+                } else {
+                    // Gentle retry for normal or broom square so the child learns happily!
+                    btnEl.classList.add('bg-red-900/70', 'border-red-400', 'opacity-60');
+                    btnEl.disabled = true;
+                    feedbackBox.classList.remove('hidden');
+                    feedbackBox.className = 'mt-3 p-2.5 rounded-xl text-center font-bold text-xs sm:text-sm bg-amber-900/80 border border-amber-400 text-amber-100';
+                    feedbackBox.innerHTML = `💡 Almost! Listen to the letter again and try another magical button! حاولي مرة أخرى!`;
+                    speakCurrentModalLetter();
+                }
+            }
+        }
+
+        function closeLetterModal() {
+            const modal = document.getElementById('letterCardModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            setMusicDucking(false);
+        }
+
+        function finishTurn() {
+            if (gameState.playerCount === 2) {
+                gameState.currentTurn = (gameState.currentTurn + 1) % 2;
+            }
+            gameState.isMoving = false;
+            document.getElementById('rollWandBtn').disabled = false;
+            const nextPlayer = gameState.players[gameState.currentTurn];
+            document.getElementById('dicePromptText').textContent = `${nextPlayer.name}: اضغطي على العصا السحرية!`;
+            updateSidebarPlayersUI();
+        }
+
+        /* =====================================================================
+           12. END-OF-BOARD REWARD: UNLOCKING & CASTING HARRY POTTER SPELLS!
+           ===================================================================== */
+        function handleBoardVictory() {
+            playSFX('fanfare');
+            addHousePoints(50);
+
+            // Find the next spell to unlock (0 to 4)
+            let nextSpellId = 0;
+            for (let i = 0; i < HOGWARTS_SPELLS.length; i++) {
+                if (!gameState.unlockedSpells.includes(i)) {
+                    nextSpellId = i;
+                    break;
+                }
+                if (i === HOGWARTS_SPELLS.length - 1) {
+                    // All 5 unlocked, cycle based on board round
+                    nextSpellId = (gameState.boardRound - 1) % HOGWARTS_SPELLS.length;
+                }
+            }
+
+            if (!gameState.unlockedSpells.includes(nextSpellId)) {
+                gameState.unlockedSpells.push(nextSpellId);
+                try {
+                    localStorage.setItem('hogwarts_arabic_spells', JSON.stringify(gameState.unlockedSpells));
+                } catch (e) {}
+            }
+
+            currentUnlockedSpellIndex = nextSpellId;
+            const spell = HOGWARTS_SPELLS[nextSpellId];
+
+            document.getElementById('unlockedSpellIcon').textContent = spell.icon;
+            document.getElementById('unlockedSpellName').textContent = `${spell.name}!`;
+            document.getElementById('unlockedSpellArabic').textContent = `${spell.arabicTitle} (${spell.englishSubtitle})`;
+            document.getElementById('unlockedSpellDesc').textContent = `${spell.wandMovement} — ${spell.description}`;
+
+            updateSidebarPlayersUI();
+
+            const modal = document.getElementById('victorySpellModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+
+            // Trigger celebratory visual spell animation automatically!
+            setTimeout(() => {
+                triggerSpellAnimation(nextSpellId);
+            }, 400);
+        }
+
+        function startNextBoardRound() {
+            document.getElementById('victorySpellModal').classList.add('hidden');
+            document.getElementById('victorySpellModal').classList.remove('flex');
+
+            gameState.boardRound++;
+            gameState.players[0].position = 1;
+            gameState.players[1].position = 1;
+            gameState.currentTurn = 0;
+            gameState.isMoving = false;
+            document.getElementById('rollWandBtn').disabled = false;
+
+            renderPlayerTokens();
+            playSFX('wand');
+        }
+
+        // Interactive Fullscreen Visual Effects for all 5 Harry Potter Spells!
+        function triggerSpellAnimation(spellIndex) {
+            const spell = HOGWARTS_SPELLS[spellIndex] || HOGWARTS_SPELLS[0];
+            const overlay = document.getElementById('spellEffectOverlay');
+            overlay.innerHTML = '';
+            overlay.classList.remove('hidden');
+
+            playSFX('fanfare');
+
+            // Top Banner announcing the spell incantation
+            const banner = document.createElement('div');
+            banner.className = 'fixed top-12 left-1/2 -translate-x-1/2 bg-slate-950/95 gold-border px-6 py-3 rounded-2xl text-center shadow-2xl z-[130] animate-bounce';
+            banner.innerHTML = `
+                <div class="font-magic text-2xl sm:text-4xl text-amber-300 gold-glow-text">${spell.icon} ${spell.name}!</div>
+                <div class="font-arabic text-sm sm:text-base text-emerald-300 font-bold">${spell.arabicTitle}</div>
+            `;
+            overlay.appendChild(banner);
+
+            if (spellIndex === 0) {
+                // 1. Wingardium Leviosa: Feathers & Golden Arabic Letters floating upward!
+                const sampleLetters = ['أ', 'ب', 'ت', 'ج', 'ح', 'س', 'ش', 'ع', 'ق', 'م', 'ن', 'ي'];
+                for (let i = 0; i < 26; i++) {
+                    const el = document.createElement('div');
+                    const isFeather = i % 2 === 0;
+                    el.className = 'fixed text-3xl sm:text-5xl font-arabic font-black text-amber-300 gold-glow-text transition-all duration-[3200ms] ease-out';
+                    el.style.left = `${5 + Math.random() * 90}vw`;
+                    el.style.top = `105vh`;
+                    el.textContent = isFeather ? (i % 4 === 0 ? '🪶' : '✨') : sampleLetters[i % sampleLetters.length];
+                    overlay.appendChild(el);
+
+                    setTimeout(() => {
+                        el.style.transform = `translateY(-120vh) rotate(${Math.random() * 60 - 30}deg) scale(1.25)`;
+                        el.style.opacity = '0';
+                    }, 50 + i * 70);
+                }
+            } else if (spellIndex === 1) {
+                // 2. Lumos Maxima: Glowing golden wand beam illuminating secret Arabic letters in the dark!
+                overlay.style.background = 'radial-gradient(circle at center, rgba(254, 240, 138, 0.45) 0%, rgba(10, 14, 34, 0.92) 70%)';
+                const centerGlow = document.createElement('div');
+                centerGlow.className = 'fixed inset-0 flex flex-col items-center justify-center';
+                centerGlow.innerHTML = `
+                    <div class="w-44 h-44 sm:w-64 sm:h-64 rounded-full bg-yellow-300/30 border-4 border-yellow-200 shadow-[0_0_120px_#fef08a] flex items-center justify-center text-6xl sm:text-8xl animate-pulse">
+                        💡🪄
+                    </div>
+                    <div class="mt-6 flex flex-wrap justify-center gap-4 max-w-xl px-4">
+                        ${['أ', 'ب', 'ت', 'ث', 'ج', 'ح', 'خ', 'د', 'ذ', 'ر', 'ز', 'س'].map(l =>
+                            `<span class="font-arabic text-3xl sm:text-5xl font-black text-yellow-200 drop-shadow-[0_0_15px_#fef08a]">${l}</span>`
+                        ).join('')}
+                    </div>
+                `;
+                overlay.appendChild(centerGlow);
+            } else if (spellIndex === 2) {
+                // 3. Alohomora: Unlocking Treasure Chest bursting with Rubies, Diamonds & Gold Coins!
+                const chestBox = document.createElement('div');
+                chestBox.className = 'fixed inset-0 flex flex-col items-center justify-center';
+                chestBox.innerHTML = `
+                    <div class="text-7xl sm:text-9xl animate-bounce">🗝️🧰💎</div>
+                    <div class="font-magic text-2xl sm:text-3xl text-amber-300 mt-3 gold-glow-text">Hogwarts Treasure Unlocked!</div>
+                `;
+                overlay.appendChild(chestBox);
+
+                const gems = ['💎', '🪙', '👑', '🏆', '✨', '❤️'];
+                for (let i = 0; i < 30; i++) {
+                    const gem = document.createElement('div');
+                    gem.className = 'fixed text-3xl sm:text-4xl transition-all duration-[2600ms] ease-out';
+                    gem.style.left = '50vw';
+                    gem.style.top = '55vh';
+                    gem.textContent = gems[i % gems.length];
+                    overlay.appendChild(gem);
+
+                    setTimeout(() => {
+                        const angle = (Math.PI * 2 * i) / 30;
+                        const dist = 120 + Math.random() * 260;
+                        gem.style.transform = `translate(${Math.cos(angle) * dist}px, ${Math.sin(angle) * dist}px) scale(1.3)`;
+                        gem.style.opacity = '0';
+                    }, 80);
+                }
+            } else if (spellIndex === 3) {
+                // 4. Expecto Patronum: Silver-Blue Guardian Stag & Snowy Owl soaring across the screen!
+                overlay.style.background = 'radial-gradient(circle at center, rgba(56, 189, 248, 0.35) 0%, rgba(8, 47, 73, 0.85) 80%)';
+                const patronus = document.createElement('div');
+                patronus.className = 'fixed inset-0 flex flex-col items-center justify-center';
+                patronus.innerHTML = `
+                    <div class="w-48 h-48 sm:w-64 sm:h-64 rounded-full bg-cyan-300/25 border-4 border-cyan-200 shadow-[0_0_100px_#38bdf8] flex items-center justify-center text-6xl sm:text-8xl animate-bounce">
+                        🦌🦉❄️
+                    </div>
+                    <div class="mt-4 font-magic text-xl sm:text-3xl text-cyan-200 drop-shadow-[0_0_12px_#38bdf8]">
+                        Silver Patronus Guardian Activated!
+                    </div>
+                `;
+                overlay.appendChild(patronus);
+            } else if (spellIndex === 4) {
+                // 5. Riddikulus: Funny Dancing Snake wearing a Party Hat & Glasses!
+                const funnySnake = document.createElement('div');
+                funnySnake.className = 'fixed inset-0 flex flex-col items-center justify-center bg-purple-950/60';
+                funnySnake.innerHTML = `
+                    <div class="bg-slate-900/95 gold-border rounded-3xl p-6 text-center shadow-2xl animate-bounce">
+                        <div class="text-5xl sm:text-7xl">🥳🎩</div>
+                        <div class="text-6xl sm:text-8xl -mt-2">🐍🕶️🎈</div>
+                        <div class="font-magic text-xl sm:text-2xl text-pink-300 mt-3">Hahaha! The Slytherin Snake is Dancing!</div>
+                        <div class="font-arabic text-base text-amber-200 font-bold">تحول الثعبان إلى مهرج مضحك يرقص مع الحروف!</div>
+                    </div>
+                `;
+                overlay.appendChild(funnySnake);
+            }
+
+            setTimeout(() => {
+                overlay.style.background = 'transparent';
+                overlay.classList.add('hidden');
+                overlay.innerHTML = '';
+            }, 3400);
+        }
+
+        /* =====================================================================
+           13. SPELLBOOK MODAL (كتاب التعاويذ السحرية)
+           ===================================================================== */
+        function openSpellbookModal() {
+            const grid = document.getElementById('spellbookGrid');
+            grid.innerHTML = '';
+
+            HOGWARTS_SPELLS.forEach((spell, idx) => {
+                const isUnlocked = gameState.unlockedSpells.includes(idx);
+                const card = document.createElement('div');
+                card.className = isUnlocked
+                    ? 'bg-slate-900/90 border-2 border-amber-400 rounded-2xl p-4 flex flex-col justify-between shadow-lg'
+                    : 'bg-slate-950/70 border border-slate-700 rounded-2xl p-4 flex flex-col justify-between opacity-75';
+
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-3xl sm:text-4xl">${isUnlocked ? spell.icon : '🔒'}</span>
+                            <span class="text-xs font-extrabold px-2.5 py-0.5 rounded-full ${isUnlocked ? 'bg-amber-400 text-slate-950' : 'bg-slate-800 text-slate-400'}">
+                                ${isUnlocked ? `Unlocked ✨` : `Board #${idx + 1} Reward`}
+                            </span>
+                        </div>
+                        <h3 class="font-magic text-lg sm:text-xl text-amber-300">${spell.name}</h3>
+                        <div class="font-arabic text-sm font-bold text-emerald-300">${spell.arabicTitle} (${spell.englishSubtitle})</div>
+                        <p class="text-xs text-amber-100/80 mt-1.5 leading-relaxed">${spell.description}</p>
+                    </div>
+                    <div class="mt-3 pt-2.5 border-t border-amber-400/20">
+                        ${isUnlocked
+                            ? `<button onclick="triggerSpellAnimation(${idx})" class="btn-magic w-full py-2 rounded-xl text-xs sm:text-sm font-extrabold flex items-center justify-center gap-1.5">
+                                <span>🪄</span>
+                                <span>Cast "${spell.name}"! | جربي التعويذة</span>
+                               </button>`
+                            : `<div class="text-center text-xs text-amber-200/60 font-arabic py-1">
+                                🏰 أكملي البورد رقم ${idx + 1} لفتح هذه التعويذة (أو اضغطي زر المعلم بالأعلى)
+                               </div>`
+                        }
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+
+            const modal = document.getElementById('spellbookModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeSpellbookModal() {
+            const modal = document.getElementById('spellbookModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function unlockAllSpellsTeacher() {
+            gameState.unlockedSpells = [0, 1, 2, 3, 4];
+            try {
+                localStorage.setItem('hogwarts_arabic_spells', JSON.stringify(gameState.unlockedSpells));
+            } catch (e) {}
+            playSFX('wand');
+            updateSidebarPlayersUI();
+            openSpellbookModal();
+        }
+
+        /* =====================================================================
+           14. SETUP MODAL & CUSTOM AVATAR PHOTO UPLOAD
+           ===================================================================== */
+        function openSetupModal() {
+            const modal = document.getElementById('setupModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function selectPlayerCount(count) {
+            gameState.playerCount = count;
+            const b1 = document.getElementById('mode1PBtn');
+            const b2 = document.getElementById('mode2PBtn');
+            const p2Box = document.getElementById('player2SetupBox');
+
+            if (count === 1) {
+                b1.className = 'py-2.5 px-3 rounded-xl font-bold text-sm border-2 border-amber-400 bg-amber-500/25 text-amber-200 flex items-center justify-center gap-2 transition';
+                b2.className = 'py-2.5 px-3 rounded-xl font-bold text-sm border border-amber-400/30 bg-slate-900/60 text-slate-300 flex items-center justify-center gap-2 transition';
+                p2Box.classList.add('hidden');
+            } else {
+                b2.className = 'py-2.5 px-3 rounded-xl font-bold text-sm border-2 border-amber-400 bg-amber-500/25 text-amber-200 flex items-center justify-center gap-2 transition';
+                b1.className = 'py-2.5 px-3 rounded-xl font-bold text-sm border border-amber-400/30 bg-slate-900/60 text-slate-300 flex items-center justify-center gap-2 transition';
+                p2Box.classList.remove('hidden');
+            }
+        }
+
+        function selectPresetAvatar(playerIdx, type) {
+            gameState.players[playerIdx].avatarType = type;
+            gameState.players[playerIdx].customImage = null;
+
+            if (playerIdx === 0) {
+                ['harry', 'hermione', 'hedwig', 'custom'].forEach(t => {
+                    const el = document.getElementById(`p0_avatar_${t}`);
+                    if (!el) return;
+                    if (t === type) {
+                        el.className = 'avatar-choice-p0 border-2 border-amber-400 bg-amber-500/25 rounded-xl p-2 flex flex-col items-center gap-1 transition';
+                    } else {
+                        el.className = 'avatar-choice-p0 border border-amber-400/30 bg-slate-900/70 rounded-xl p-2 flex flex-col items-center gap-1 transition';
+                    }
+                });
+            } else {
+                ['harry', 'hermione', 'hedwig'].forEach(t => {
+                    const el = document.getElementById(`p1_avatar_${t}`);
+                    if (!el) return;
+                    if (t === type) {
+                        el.className = 'border-2 border-emerald-400 bg-emerald-500/25 rounded-xl p-1.5 flex items-center justify-center gap-2 text-xs font-bold text-emerald-200';
+                    } else {
+                        el.className = 'border border-emerald-400/30 bg-slate-900/70 rounded-xl p-1.5 flex items-center justify-center gap-2 text-xs font-bold text-emerald-200';
+                    }
+                });
+            }
+        }
+
+        function handleCustomAvatarUpload(event, playerIdx) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const dataUrl = e.target.result;
+                gameState.players[playerIdx].customImage = dataUrl;
+                const previewEl = document.getElementById(`customPhotoPreview${playerIdx}`);
+                if (previewEl) {
+                    previewEl.innerHTML = `<img src="${dataUrl}" class="w-full h-full object-cover rounded-full">`;
+                }
+                if (playerIdx === 0) {
+                    ['harry', 'hermione', 'hedwig', 'custom'].forEach(t => {
+                        const el = document.getElementById(`p0_avatar_${t}`);
+                        if (!el) return;
+                        if (t === 'custom') {
+                            el.className = 'avatar-choice-p0 border-2 border-amber-400 bg-amber-500/25 rounded-xl p-2 flex flex-col items-center gap-1 cursor-pointer transition';
+                        } else {
+                            el.className = 'avatar-choice-p0 border border-amber-400/30 bg-slate-900/70 rounded-xl p-2 flex flex-col items-center gap-1 transition';
+                        }
+                    });
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function startGameFromModal() {
+            const p1Name = document.getElementById('player1NameInput').value.trim() || 'Little Witch ⚡';
+            const p2Name = document.getElementById('player2NameInput').value.trim() || 'Professor 🦉';
+            gameState.players[0].name = p1Name;
+            gameState.players[1].name = p2Name;
+
+            const modal = document.getElementById('setupModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+
+            renderPlayerTokens();
+            startBackgroundMusic();
+            playSFX('wand');
+        }
+
+        /* =====================================================================
+           15. TEACHER HELPER FUNCTIONS
+           ===================================================================== */
+        function teacherPracticeCurrentSquare() {
+            const p = gameState.players[gameState.currentTurn];
+            let targetSq = p.position;
+            if (targetSq < 2 || targetSq > 29) targetSq = 2; // Default to Alif if on Start
+            const letterObj = ARABIC_LETTERS.find(l => l.square === targetSq);
+            if (letterObj) {
+                openLetterChallengeModal(letterObj, 'normal');
+            }
+        }
+
+        async function teacherJumpToFinish() {
+            if (gameState.isMoving) return;
+            const pIdx = gameState.currentTurn;
+            gameState.players[pIdx].position = 30;
+            updateTokenPositionOnBoard(pIdx, 'fly');
+            updateSidebarPlayersUI();
+            await sleep(600);
+            handleBoardVictory();
+        }
+
+        /* =====================================================================
+           16. TWINKLING STARS CANVAS & WAND SPARKLE CURSOR TRAIL
+           ===================================================================== */
+        function initStarsAndSparkles() {
+            const canvas = document.getElementById('starsCanvas');
+            const ctx = canvas.getContext('2d');
+            let stars = [];
+
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                stars = Array.from({ length: 75 }, () => ({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    r: Math.random() * 1.8 + 0.5,
+                    alpha: Math.random(),
+                    speed: Math.random() * 0.02 + 0.005
+                }));
+            }
+
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
+
+            function animateStars() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                stars.forEach(s => {
+                    s.alpha += s.speed;
+                    if (s.alpha > 1 || s.alpha < 0.15) s.speed = -s.speed;
+                    ctx.beginPath();
+                    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(253, 224, 71, ${Math.max(0.1, Math.min(1, s.alpha))})`;
+                    ctx.fill();
+                });
+                requestAnimationFrame(animateStars);
+            }
+            animateStars();
+
+            // Interactive Wand Sparkle Trail on Mouse/Touch
+            let lastSparkleTime = 0;
+            window.addEventListener('pointermove', (e) => {
+                const now = Date.now();
+                if (now - lastSparkleTime < 45) return;
+                lastSparkleTime = now;
+                spawnWandSparkle(e.clientX, e.clientY);
+            });
+        }
+
+        function spawnWandSparkle(x, y) {
+            const sp = document.createElement('div');
+            sp.className = 'wand-sparkle';
+            const size = Math.random() * 6 + 4;
+            sp.style.width = `${size}px`;
+            sp.style.height = `${size}px`;
+            sp.style.left = `${x}px`;
+            sp.style.top = `${y}px`;
+            sp.style.background = Math.random() > 0.3 ? '#fde047' : '#f472b6';
+            sp.style.boxShadow = '0 0 8px #fde047';
+            sp.style.setProperty('--tx', `${(Math.random() - 0.5) * 30}px`);
+            sp.style.setProperty('--ty', `${(Math.random() - 0.5) * 30 + 15}px`);
+            document.body.appendChild(sp);
+            setTimeout(() => sp.remove(), 750);
+        }
+
+        function createSparkleBurst(element) {
+            const rect = element.getBoundingClientRect();
+            const cx = rect.left + rect.width / 2;
+            const cy = rect.top + rect.height / 2;
+            for (let i = 0; i < 12; i++) {
+                spawnWandSparkle(cx + (Math.random() - 0.5) * 40, cy + (Math.random() - 0.5) * 40);
+            }
+        }
+
+        /* =====================================================================
+           17. INITIALIZATION ON WINDOW LOAD
+           ===================================================================== */
+        window.onload = function() {
+            // Render SVG previews inside Setup Modal
+            document.getElementById('previewSvgHarry0').innerHTML = getAvatarSVG('harry');
+            document.getElementById('previewSvgHermione0').innerHTML = getAvatarSVG('hermione');
+            document.getElementById('previewSvgHedwig0').innerHTML = getAvatarSVG('hedwig');
+
+            // Pre-load voices for Arabic SpeechSynthesis
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.getVoices();
+                window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+            }
+
+            buildBoardGrid();
+            renderPlayerTokens();
+            initStarsAndSparkles();
+        };
+    </script>
+</body>
+</html>
